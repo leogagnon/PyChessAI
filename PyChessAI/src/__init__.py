@@ -14,6 +14,7 @@ from Modele.Elements.memoire import Memoire
 from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Players.enums import ModeDeJeu, TypePiece, MoveSpecial
+from tkinter import *
 
 class Chess():
     def __init__(self):
@@ -42,7 +43,10 @@ class Chess():
         Opponents.tourBlanc = True
 
         #Indique le mode de jeu choisi (par défaut JOUEUR_JOUEUR)
-        self.modeDeJeu = ModeDeJeu.JOUEUR_JOUEUR
+        self.modeDeJeu = ModeDeJeu.JOUEUR_MACHINE
+
+        #Init
+        self.master = Tk()
 
         #Initialisation de la fenetre de PyGame
         self.init_pygame()
@@ -87,7 +91,14 @@ class Chess():
                             #si on clique sur le boutton undo (commentaire pour le if suivant)
                         elif Memoire.numero_move != 0 and self.undo_button.image.get_rect().move(self.undo_button.position[0], self.undo_button.position[1]).collidepoint(self.positionCurseur):
                             Memoire.undo(self.board)
+                            Memoire.undo(self.board)
                             self.boardToInterface()
+                        elif self.list_button[0].get_rect().move(self.list_button.position[0], self.list_button.position[1]).collidepoint(self.positionCurseur):
+                            lb = Listbox(self.master)
+                            for i in range(len(Memoire.tous_move)):
+                                lb.insert(i, Memoire.tous_move[i])
+                            lb.pack()
+                            self.master.mainloop()
 
                         posRoi = PieceM.trouverRoi(self.board, Opponents.tourBlanc)
                         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
@@ -101,7 +112,7 @@ class Chess():
                 if self.board[posRoi[0]][posRoi[1]].mat(self.board):
                     done = True
 
-                special = Opponents.getPlayerTour().play(self.board)
+                Opponents.getPlayerTour().play(self.board)
                 self.boardToInterface()
 
                 # voir si le joueur est mat ou sinon il peut pas jouer

@@ -11,7 +11,7 @@ class AlphaBeta(Cpu):
     #constructeur
     def __init__(self, couleur):
         super().__init__(couleur)
-        self.depth = 2
+        self.depth = 1
         self.board = None
         self.bestScore = -300
 
