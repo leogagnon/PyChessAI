@@ -4,6 +4,7 @@ from Modele.Elements.reine import Reine
 from Modele.Elements.fou import Fou
 from Modele.Elements.chevalier import Chevalier
 from Modele.Elements.pieceM import PieceM
+from Modele.Players.enums import *
 
 #la classe Chevalier est une PieceM de type chevalier (c'est à dire que c'est l'équivalent de la pièce chevalier pour la mémoire)
 class Pion(PieceM):
@@ -17,7 +18,7 @@ class Pion(PieceM):
             self.vitesse = 1
         else:
             self.vitesse = -1
-        self.choices = ["reine", "tour", "fou", "cavalier"]
+        self.choices = [TypePiece.REINE, TypePiece.TOUR, TypePiece.FOU, TypePiece.CAVALIER]
         
     #c'est pour savoir si le pion est dans une self.position faible (pour l'évaluation chez le comp)
     def disadvantage(self, board):
@@ -41,7 +42,6 @@ class Pion(PieceM):
             if self.first:
                 if board[self.position[0]][self.position[1] + self.vitesse*2] == None:
                     moves[self.position[0]][self.position[1] + self.vitesse*2] = True
-
         if self.position[0] + 1 <= 7:
             if board[self.position[0] + 1][self.position[1] + self.vitesse] != None and board[self.position[0] + 1][self.position[1] + self.vitesse].couleurBlanc != self.couleurBlanc:
                 moves[self.position[0] + 1][self.position[1] + self.vitesse] = True
@@ -81,5 +81,5 @@ class Pion(PieceM):
     #pouvoir connaître les choix de promotion possibles
     @staticmethod
     def getChoices():
-        return ["reine", "tour", "fou", "cavalier"]
+        return [TypePiece.REINE, TypePiece.TOUR, TypePiece.FOU, TypePiece.CAVALIER]
             

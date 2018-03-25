@@ -21,8 +21,8 @@ class Humain(Joueur):
         Modele.Players.opponents.Opponents.screen.blit(text_surface, (self.echiquierImageCote + 10, 30))
 
         for i in range(4):
-            listeButton.append(Bouton(i, [self.echiquierImageCote + 10, 100 + 40 * i]))
-            Modele.Players.opponents.Opponents.screen.blit(listeButton[i].image, listeButton[i].location)
+            listeButton.append(Bouton(Pion.getChoices()[i].name, [self.echiquierImageCote + 10, 100 + 40 * i]))
+            Modele.Players.opponents.Opponents.screen.blit(listeButton[i].image, listeButton[i].position)
 
         done = False
 
@@ -33,7 +33,7 @@ class Humain(Joueur):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     positionCurseur = pygame.mouse.get_pos()
                     for i in range(len(listeButton)):
-                        if listeButton[i].image.get_rect().move(listeButton[i].location).collidepoint(positionCurseur):
+                        if listeButton[i].image.get_rect().move(listeButton[i].position).collidepoint(positionCurseur):
                             input_number = i
                             done = True
             pygame.display.flip()

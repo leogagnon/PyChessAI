@@ -47,6 +47,8 @@ class Chess():
         #Initialisation de la fenetre de PyGame
         self.init_pygame()
 
+        self.test = 0
+
     def main_loop(self):
 
         """
@@ -57,10 +59,6 @@ class Chess():
 
         #Indique si la partie est terminée
         done = False
-        #Valeurs temporaires utilisées pour faire des évaluations
-
-        vert = None
-
         #Boucle principale
         while not done:
             if Opponents.playerTourHumain():
@@ -75,32 +73,41 @@ class Chess():
                             for j in i:
                                 if j != None and j.image.get_rect().move(j.position[0], j.position[1]).collidepoint(self.positionCurseur):
                                     pieceTemp = j
+
                         if pieceTemp != None and (Opponents.tourBlanc == pieceTemp.estBlanc or pieceTemp.estVert):
+                           # print(pieceTemp.estVert)
                             self.clicked(pieceTemp)
                         vert = None
                         for temp in self.listeVert:
                             if temp.image.get_rect().move(temp.position[0], temp.position[1]).collidepoint(self.positionCurseur):
                                 vert = temp
 
-                        if vert != None:
+                        if vert is not None:
                             self.clickedVert(vert)
                             #si on clique sur le boutton undo (commentaire pour le if suivant)
                         elif Memoire.numero_move != 0 and self.undo_button.image.get_rect().move(self.undo_button.position[0], self.undo_button.position[1]).collidepoint(self.positionCurseur):
                             Memoire.undo(self.board)
                             self.boardToInterface()
-                            # si on clique sur le boutton liste_move (commentaire pour le if suivant) -> va afficher tous les moves réalisé
-                        #elif self.list_button.image.get_rect().move(self.list_button.largeur, self.list_button.hauteur).collidepoint(positionCurseur):
-                            #master = Tk()
-                            #lb = Listbox(master)
-                            #for i in range(len(Memoire.tous_move)):
-                            #    lb.insert(i, Memoire.tous_move[i])
-                            #lb.pack()
-                            #master.mainloop()
+
+                        posRoi = PieceM.trouverRoi(self.board, Opponents.tourBlanc)
+                        if self.board[posRoi[0]][posRoi[1]].mat(self.board):
+                            done = True
+
 
 
             else:
+                # pour voir s'il est en mat en premier ou sinon erreur
+                posRoi = PieceM.trouverRoi(self.board, Opponents.tourBlanc)
+                if self.board[posRoi[0]][posRoi[1]].mat(self.board):
+                    done = True
+
                 special = Opponents.getPlayerTour().play(self.board)
                 self.boardToInterface()
+
+                # voir si le joueur est mat ou sinon il peut pas jouer
+                posRoi = PieceM.trouverRoi(self.board, Opponents.tourBlanc)
+                if self.board[posRoi[0]][posRoi[1]].mat(self.board):
+                    done = True
 
             pygame.display.flip()
         pygame.display.quit()
@@ -202,7 +209,7 @@ class Chess():
 
             for vert in self.listeVert:
                 self.screen.blit(vert.image, vert.position)
-                self.lastPosition = coordonnees[:]
+            self.lastPosition = coordonnees[:]
 
 
 
@@ -311,7 +318,7 @@ class Chess():
                 inputs = Pion.getChoices()[2]
             elif isinstance(self.board[position[0]][position[1]], Chevalier):
                 inputs = Pion.getChoices()[3]
-            tempPiece = Piece(inputs, self.listePiece[position[0]][position[1]].couleur, position)
+            tempPiece = Piece(inputs.name, self.listePiece[position[0]][position[1]].estBlanc, position)
             self.listePiece[position[0]][position[1]] = tempPiece
         elif move_special == MoveSpecial.ROQUE:
             if lastPosition[0] - position[0] == -2:
