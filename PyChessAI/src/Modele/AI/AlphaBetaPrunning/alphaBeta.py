@@ -11,7 +11,7 @@ class AlphaBeta(Cpu):
     #constructeur
     def __init__(self, couleur):
         super().__init__(couleur)
-        self.depth = 1
+        self.depth = 2
         self.board = None
         self.bestScore = -300
 
@@ -25,8 +25,6 @@ class AlphaBeta(Cpu):
                     if temp2.couleurBlanc != self.couleurBlanc:
                         multiplier = -1
                     total += multiplier * temp2.value
-                    if isinstance(temp2, Modele.Elements.pion.Pion) and temp2.disadvantage(board):
-                        total -= multiplier * 0.5
                     total += multiplier * 0.1 * self.countAvailableMoves(temp2.possibiliteBouger(board))
         return total
 
