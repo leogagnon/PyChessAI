@@ -8,7 +8,6 @@ class Image(ABC):
         :param nom: Nom de l'image
         :param position: Position (largeur,hauteur) en pixel
         """
-
         self.nom = nom
         self.position = position
         self.image = None
@@ -19,6 +18,7 @@ class Image(ABC):
     def init_image(self):
         """
         Initialise l'image
+        Est overide dans toutes les classes filles
         """
         self.image = pygame.image.load("Vue\images\\" + self.nom + ".png")
 
