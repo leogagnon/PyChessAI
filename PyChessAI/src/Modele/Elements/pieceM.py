@@ -59,7 +59,7 @@ class PieceM(ABC):
         elif isinstance(board[position[0]][position[1]], Modele.Elements.tour.Tour):
             if not(board[position[0]][position[1]].moved):
                 board[position[0]][position[1]].moved = True
-                special = MoveSpecial.MOUVEMENT_TOUR
+                special = MoveSpecial.PREMIER_MOUVEMENT_TOUR
         elif isinstance(board[position[0]][position[1]], Modele.Elements.roi.Roi):
             if not board[position[0]][position[1]].moved:
                 special = MoveSpecial.PREMIER_MOUVEMENT_ROI

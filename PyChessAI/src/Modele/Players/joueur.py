@@ -12,5 +12,5 @@ class Joueur(ABC):
         pass
     #Voir si c'est le tour du joueur à jouer (est ce que sa couleur "match" la couleur du joueur à qui c'est le tour)
     def sonTour(self):
-        return self.couleurBlanc == Modele.Players.opponents.Opponents.tourBlanc
+        return self.couleurBlanc == Modele.Players.opponents.Opponents.tour_blanc
 

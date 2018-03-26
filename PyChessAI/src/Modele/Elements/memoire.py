@@ -31,7 +31,7 @@ class Memoire:
         if manger is not None:
             Memoire.mange(manger)
         Memoire.numero_move += 1
-        Opponents.tourBlanc = not Opponents.tourBlanc
+        Opponents.tour_blanc = not Opponents.tour_blanc
 
     #normal means that it only saves what piece moved from where to where
     @staticmethod
@@ -93,7 +93,7 @@ class Memoire:
                 else:
                     board[0][position[1]] = Modele.Elements.tour.Tour([0,position[1]], pieceBouger.couleurBlanc)
                     board[3][position[1]] = None
-            elif special == MoveSpecial.MOUVEMENT_TOUR: #the rook has been moved for the first time
+            elif special == MoveSpecial.PREMIER_MOUVEMENT_TOUR: #the rook has been moved for the first time
                 board[lastPosition[0]][lastPosition[1]].moved = False
             elif special == MoveSpecial.PREMIER_MOUVEMENT_ROI: #the king has been moved for the first time and did not do the roque
                 board[lastPosition[0]][lastPosition[1]].moved = False
@@ -103,7 +103,7 @@ class Memoire:
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
         Memoire.numero_move -= 1
-        Opponents.tourBlanc = not Opponents.tourBlanc
+        Opponents.tour_blanc = not Opponents.tour_blanc
 
 
 

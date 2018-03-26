@@ -5,7 +5,7 @@ from Modele.Players.alphaBeta import AlphaBeta
 class Opponents():
     player1 = None
     player2 = None
-    tourBlanc = True #c'est le tour de quelle couleur
+    tour_blanc = True #c'est le tour de quelle couleur
     gameMode = -1 # gameMode == 0 -> player vs player ;  1 -> player vs AI ; 2 -> AI vs AI
     screen = None # pour afficher sur le screen (si on veut demander une question à l'utilisateur)
 
