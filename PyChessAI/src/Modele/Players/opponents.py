@@ -1,5 +1,5 @@
 from Modele.Players.humain import Humain
-from Modele.Players.alphaBeta import AlphaBeta
+from Modele.AI.AlphaBetaPrunning.alphaBeta import AlphaBeta
 
 #Cette classe est en certain terme une façon de storer toutes les informations de deux joueurs
 class Opponents():

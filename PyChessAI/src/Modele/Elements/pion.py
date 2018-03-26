@@ -20,19 +20,6 @@ class Pion(PieceM):
             self.vitesse = -1
         self.choices = [TypePiece.REINE, TypePiece.TOUR, TypePiece.FOU, TypePiece.CAVALIER]
         
-    #c'est pour savoir si le pion est dans une self.position faible (pour l'évaluation chez le comp)
-    def disadvantage(self, board):
-        if board[self.position[0]][self.position[1] + self.vitesse] != None and board[self.position[0]][self.position[1] + self.vitesse].couleurBlanc != self.couleurBlanc:
-            return True
-        y = self.position[1] + self.vitesse
-        continu = True
-        while continu:
-            if (y <= 6 and self.couleurBlanc) or (y >= 1 and not self.couleurBlanc):
-                continu = False
-            elif continu and isinstance(board[self.position[0]][y], Pion) and board[self.position[1]][y].couleurBlanc:
-                return True
-            y += self.vitesse
-        return False
 
     # voir où sa se fait override (pieceM possibiliteBouger)
     def possibiliteBouger(self, board):
