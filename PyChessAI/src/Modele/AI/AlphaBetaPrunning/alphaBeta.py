@@ -1,4 +1,4 @@
-from Modele.Players.cpu import Cpu #le Cpu est utile vu que Alpha Beta est un Cpu et que je veux que celui-ci puisse avoir les caractéristiques minimales pour faire un mouvement
+from Modele.Players.machine import Machine #le Machine est utile vu que Alpha Beta est un Machine et que je veux que celui-ci puisse avoir les caractéristiques minimales pour faire un mouvement
 import Modele
 from Modele.Elements.pieceM import PieceM
 import copy #pour pouvoir copier adéquatement la matrice board
@@ -7,11 +7,11 @@ import copy #pour pouvoir copier adéquatement la matrice board
 #Voici le premier AI que nous avons fait
 #C'est le plus simple et c'est l'implémentation d'un algorithme assez connu (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
 
-class AlphaBeta(Cpu):
+class AlphaBeta(Machine):
     #constructeur
     def __init__(self, couleur):
         super().__init__(couleur)
-        self.depth = 2
+        self.depth = 3
         self.board = None
         self.bestScore = -300
 
@@ -22,7 +22,7 @@ class AlphaBeta(Cpu):
             for temp2 in temp1:
                 if temp2 is not None :
                     multiplier = 1
-                    if temp2.couleurBlanc != self.couleurBlanc:
+                    if temp2.couleurBlanc != self.COULEUR_BLANC:
                         multiplier = -1
                     total += multiplier * temp2.value
                     total += multiplier * 0.1 * self.countAvailableMoves(temp2.possibiliteBouger(board))
@@ -62,14 +62,14 @@ class AlphaBeta(Cpu):
             return self.evaluate(self.board)
 
         #Voir si le roi adverse est en échec et mat (le score est très haut pcq c'est la meilleur possibilité pour vous -> à prioritiser)
-        posRoi = PieceM.trouverRoi(self.board, not self.couleurBlanc)
+        posRoi = PieceM.trouverRoi(self.board, not self.COULEUR_BLANC)
         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
             return 300
 
         #Faire chaqu'un des moves possibles et récursivement y chercher une évaluation
         for temp1 in self.board:
             for temp2 in temp1:
-                if temp2 is not None and temp2.couleurBlanc != self.couleurBlanc:
+                if temp2 is not None and temp2.couleurBlanc != self.COULEUR_BLANC:
                     moves = temp2.possibiliteBouger(self.board)
                     self.board[posRoi[0]][posRoi[1]].acceptableMove(moves, self.board, temp2.position)
 
@@ -87,6 +87,7 @@ class AlphaBeta(Cpu):
                                     return alpha
                                 if score < beta:
                                     beta = score
+
         return beta
 
     #Pour comprendre cela, il faut comprendre comment alphaBeta fonctionne, mais si vous vous êtes documenté c'est l'équivalent de vous (qui essayer de maximiser votre "score")
@@ -95,13 +96,13 @@ class AlphaBeta(Cpu):
     def alphaBetaMax(self, alpha, beta, depthleft):
         if depthleft == 0:
             return self.evaluate(self.board)
-        posRoi = PieceM.trouverRoi(self.board, self.couleurBlanc)
+        posRoi = PieceM.trouverRoi(self.board, self.COULEUR_BLANC)
         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
             return -300
 
         for temp1 in self.board:
             for temp2 in temp1:
-                if temp2 is not None and temp2.couleurBlanc == self.couleurBlanc:
+                if temp2 is not None and temp2.couleurBlanc == self.COULEUR_BLANC:
                     moves = temp2.possibiliteBouger(self.board)
                     self.board[posRoi[0]][posRoi[1]].acceptableMove(moves, self.board, temp2.position)
 

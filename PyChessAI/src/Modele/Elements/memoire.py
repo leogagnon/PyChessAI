@@ -1,5 +1,5 @@
 import Modele
-from Modele.Players.opponents import Opponents
+from Modele.Players.game import Game
 from Modele.Players.enums import *
 
 
@@ -23,7 +23,7 @@ class Memoire:
         if manger is not None:
             Memoire.mange(manger)
         Memoire.numero_move += 1
-        Opponents.tour_blanc = not Opponents.tour_blanc
+        Game.tour_blanc = not Game.tour_blanc
 
     #normal means that it only saves what piece moved from where to where
     @staticmethod
@@ -95,7 +95,7 @@ class Memoire:
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
         Memoire.numero_move -= 1
-        Opponents.tour_blanc = not Opponents.tour_blanc
+        Game.tour_blanc = not Game.tour_blanc
 
 
 

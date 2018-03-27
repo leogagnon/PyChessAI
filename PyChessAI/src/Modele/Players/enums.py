@@ -23,3 +23,10 @@ class MoveSpecial(Enum):
     PREMIER_MOUVEMENT_PION = 5
     PRISE_EN_PASSANT_IMPOSSIBLE = 6
 
+class TypeAI(Enum):
+    MINIMAX = 0
+    ALPHA_BETA = 1
+    NEURAL_NETWORK = 2
+    STOCKFISH = 3
+    ALPHA_ZERO = 4
+

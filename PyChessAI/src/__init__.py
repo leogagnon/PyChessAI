@@ -9,10 +9,11 @@ from Modele.Elements.fou import Fou
 from Modele.Elements.pion import Pion
 from Vue.piece import Piece
 from Vue.vert import Vert
-from Modele.Players.opponents import Opponents
+from Modele.Players.game import Game
 from Modele.Elements.memoire import Memoire
 from Vue.bouton import Bouton
 from Vue.image import Image
+from Modele.Players.humain import Humain
 from Modele.Players.enums import ModeDeJeu, TypePiece, MoveSpecial
 import easygui
 import sys
@@ -35,14 +36,14 @@ class Chess():
         self.position_curseur = []
         self.lastPosition = [0,0]
 
+        self.temps_blanc = None
+        self.temps_noir = None
+
         #Indique qui commence la partie
-        Opponents.tour_blanc = True
+        Game.tour_blanc = True
 
         #Indique le mode de jeu choisi (par défaut JOUEUR_JOUEUR)
         self.mode_de_jeu = ModeDeJeu.JOUEUR_JOUEUR
-
-        #Initialisation de tkinter
-        #self.master = Tk()
 
         #Initialisation de la fenetre de PyGame
         self.init_pygame()
@@ -51,7 +52,7 @@ class Chess():
         """
         Fonctionnement logique de la partie
         """
-        Opponents(self.mode_de_jeu, self.screen)
+        Game(self.mode_de_jeu, self.screen)
 
         self.echiquier.blit(self.screen)
         self.init_pieces()
@@ -64,7 +65,7 @@ class Chess():
         done = False
         #Boucle principale
         while not done:
-            if Opponents.playerTourHumain():
+            if isinstance(Game.get_tour(), Humain):
                 #Passe à travers tout les events détectés par PyGame
                 for event in pygame.event.get():
                     pieceTemp = None
@@ -77,7 +78,7 @@ class Chess():
                                 if j is not None and j.image.get_rect().move(j.position[0], j.position[1]).collidepoint(self.position_curseur):
                                     pieceTemp = j
 
-                        if pieceTemp is not None and (Opponents.tour_blanc == pieceTemp.estBlanc or pieceTemp.estVert):
+                        if pieceTemp is not None and (Game.tour_blanc == pieceTemp.estBlanc or pieceTemp.estVert):
                             self.clicked(pieceTemp)
                         vert = None
                         for temp in self.liste_vert:
@@ -97,7 +98,7 @@ class Chess():
                         elif self.list_button.image.get_rect().move(self.list_button.position[0], self.list_button.position[1]).collidepoint(self.position_curseur):
                             easygui.textbox('Liste des moves','Liste',Memoire.tous_move)
 
-                        posRoi = PieceM.trouverRoi(self.board, Opponents.tour_blanc)
+                        posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
                         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
                             done = True
 
@@ -105,15 +106,15 @@ class Chess():
 
             else:
                 # pour voir s'il est en mat en premier ou sinon erreur
-                posRoi = PieceM.trouverRoi(self.board, Opponents.tour_blanc)
+                posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
                 if self.board[posRoi[0]][posRoi[1]].mat(self.board):
                     done = True
 
-                Opponents.getPlayerTour().play(self.board)
+                Game.get_tour().play(self.board)
                 self.boardToInterface()
 
                 # voir si le joueur est mat ou sinon il peut pas jouer
-                posRoi = PieceM.trouverRoi(self.board, Opponents.tour_blanc)
+                posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
                 if self.board[posRoi[0]][posRoi[1]].mat(self.board):
                     done = True
 
@@ -127,6 +128,9 @@ class Chess():
         self.screen = pygame.display.set_mode((self.echiquier.dimension[0] + 200, self.echiquier.dimension[1]))
         pygame.init()
         pygame.display.set_caption("Chess program")
+
+    def init_timer(self,pos):
+        pass
 
     def intro_loop(self):
         """
@@ -330,6 +334,8 @@ class Chess():
                 self.liste_piece[0][position[1]] = None
 
         self.boardToInterface()
+
+
 
 
 chess_init = Chess()

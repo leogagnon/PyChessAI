@@ -2,7 +2,7 @@ from Modele.Players.joueur import Joueur
 from Modele.Elements.pion import Pion
 import easygui
 
-#Cela est l'équivalent du joueur humain qui va pouvoir jouer (cela ne sera utile que pour la classe Opponents)
+#Cela est l'équivalent du joueur humain qui va pouvoir jouer (cela ne sera utile que pour la classe Game)
 class Humain(Joueur):
     #le constructeur
     def __init__(self, couleurBlanc):

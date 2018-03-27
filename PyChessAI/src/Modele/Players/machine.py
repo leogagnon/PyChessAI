@@ -5,7 +5,7 @@ import Modele
 
 
 #Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)
-class Cpu(Joueur, ABC):
+class Machine(Joueur, ABC):
     #constructeur
     def __init__(self, couleur):
         super().__init__(couleur)
