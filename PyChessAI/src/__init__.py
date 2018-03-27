@@ -14,7 +14,7 @@ from Modele.Elements.memoire import Memoire
 from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Players.enums import ModeDeJeu, TypePiece, MoveSpecial
-from tkinter import Tk, Listbox
+import easygui
 
 class Chess():
     def __init__(self):
@@ -42,10 +42,10 @@ class Chess():
         Opponents.tour_blanc = True
 
         #Indique le mode de jeu choisi (par défaut JOUEUR_JOUEUR)
-        self.mode_de_jeu = ModeDeJeu.JOUEUR_MACHINE
+        self.mode_de_jeu = ModeDeJeu.JOUEUR_JOUEUR
 
         #Initialisation de tkinter
-        self.master = Tk()
+        #self.master = Tk()
 
         #Initialisation de la fenetre de PyGame
         self.init_pygame()
@@ -90,11 +90,7 @@ class Chess():
                             Memoire.undo(self.board)
                             self.boardToInterface()
                         elif self.list_button.image.get_rect().move(self.list_button.position[0], self.list_button.position[1]).collidepoint(self.position_curseur):
-                            lb = Listbox(self.master)
-                            for i in range(len(Memoire.tous_move)):
-                                lb.insert(i, Memoire.tous_move[i])
-                            lb.pack()
-                            self.master.mainloop()
+                            easygui.textbox('Liste des moves','Liste',Memoire.tous_move)
 
                         posRoi = PieceM.trouverRoi(self.board, Opponents.tour_blanc)
                         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
@@ -169,7 +165,7 @@ class Chess():
                 if event.type == pygame.QUIT:
                     done = True
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    positionCurseur = pygame.mouse.get_pos()
+                    self.positionCurseur = pygame.mouse.get_pos()
 
 
 
@@ -341,5 +337,5 @@ class Chess():
 
 
 chess_init = Chess()
-#chess_init.intro_loop()
+chess_init.intro_loop()
 chess_init.main_loop()

@@ -8,21 +8,13 @@ from Modele.Players.enums import *
 
 
 class Memoire:
+
     memoireSpecial = [] # conserve [le # du move special, le numero_move]
-
-    # bouger va faire en sorte de déplacer visuellement l'objet, même les mouvements spéciaux, comme le roque,etc
-    # special = 0 -> prise en passant
-    # special = 1 -> promotion
-    # special = 2 -> roque
-    # special = 3 -> mouvement de la tour
-
     memoireManger = [] # conserve [la pièce mangé, le numero_move]
     numero_move = 0
     tous_move = [] # va n'être qu'un array de String qui va conserver toute les informations de quelle pièce a bouger de où à où
-    #(exemple) ->   "T:a1-b1"
 
-    #this is to indicate that a move has been made so we have to save the move made and all of it's characteristics
-    # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo 
+    # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo
     @staticmethod
     def move_made(position, lastPosition, piece, manger, special):
         Memoire.normal(position, lastPosition, piece)
@@ -36,7 +28,7 @@ class Memoire:
     #normal means that it only saves what piece moved from where to where
     @staticmethod
     def normal(position, lastPosition, piece):
-        Memoire.tous_move.append(Memoire.transform(position, lastPosition, piece))
+        Memoire.tous_move.append(Memoire.transform(position, lastPosition, piece)+'\n')
 
     #its meant to transform a move to a String (exemple) ->   "T:a1-b2"
     @staticmethod
