@@ -28,6 +28,10 @@ class Image(ABC):
         """
         self.dimension = self.image.get_rect().size
 
+    def blit(self,screen):
+        screen.blit(self.image,self.position)
+
+
     @staticmethod
     def DIMENSION_CASE():
         """

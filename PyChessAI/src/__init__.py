@@ -23,7 +23,6 @@ class Chess():
         """
         Constructeur : Initialisations des différents éléments nécéssaires au jeu
         """
-
         #Déclaration des différents images
         self.echiquier = Image('echiquier', [0, 0])
         self.undo_button = Bouton('undo', [self.echiquier.dimension[0] + 25, 125 + 40 * 5])
@@ -52,13 +51,12 @@ class Chess():
         """
         Fonctionnement logique de la partie
         """
-        Opponents(self.mode_de_jeu.value, self.screen)
+        Opponents(self.mode_de_jeu, self.screen)
 
-        self.screen.blit(self.echiquier.image, self.echiquier.position)
+        self.echiquier.blit(self.screen)
         self.init_pieces()
-
-        self.screen.blit(self.undo_button.image, self.undo_button.position)
-        self.screen.blit(self.list_button.image, self.list_button.position)
+        self.undo_button.blit(self.screen)
+        self.list_button.blit(self.screen)
 
         pygame.display.flip()
 
@@ -71,7 +69,7 @@ class Chess():
                 for event in pygame.event.get():
                     pieceTemp = None
                     if event.type == pygame.QUIT:
-                        done = True
+                        sys.exit(0)
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         self.position_curseur = pygame.mouse.get_pos()
                         for i in self.liste_piece:
@@ -143,10 +141,12 @@ class Chess():
         police = pygame.font.SysFont('arial', 50)
         message = police.render('Modes de jeu',1,(255,255,255))
 
+        image_gauche = Image('roi blanc',(0,10))
+
         self.screen.blit(message,(self.echiquier.dimension[0]/2 -25,50))
-        self.screen.blit(HH_button.image, HH_button.position)
-        self.screen.blit(HM_button.image, HM_button.position)
-        self.screen.blit(MM_button.image, MM_button.position)
+        HH_button.blit(self.screen)
+        HM_button.blit(self.screen)
+        MM_button.blit(self.screen)
 
         pygame.display.flip()
 
@@ -203,11 +203,11 @@ class Chess():
                         else:
                             self.liste_piece[i][j].estVert = True
                             vertTemp = Vert([i,j])
-                            self.screen.blit(vertTemp.image, vertTemp.position)
-                            self.screen.blit(self.liste_piece[i][j].image, self.liste_piece[i][j].position)
+                            vertTemp.blit(self.screen)
+                            self.liste_piece[i][j].blit(self.screen)
 
             for vert in self.liste_vert:
-                self.screen.blit(vert.image, vert.position)
+                vert.blit(self.screen)
             self.lastPosition = coordonnees[:]
 
 
@@ -240,16 +240,16 @@ class Chess():
         Met à jour l'apparence du jeu (déselectionne tout ce qui est sélectionné)
         """
         self.screen.fill((0,0,0))
-        self.screen.blit(self.echiquier.image, (0, 0))
-        self.screen.blit(self.undo_button.image, self.undo_button.position)
-        self.screen.blit(self.list_button.image, self.list_button.position)
+        self.echiquier.blit(self.screen)
+        self.undo_button.blit(self.screen)
+        self.list_button.blit(self.screen)
 
         for i in self.liste_piece:
             for j in i:
                 if j is not None:
                     if j.estVert:
                         j.estVert = False
-                    self.screen.blit(j.image, j.position)
+                    j.blit(self.screen)
         self.liste_vert.clear()
 
     def init_pieces(self):
@@ -290,7 +290,7 @@ class Chess():
         for i in self.liste_piece:
             for j in i:
                 if j is not None:
-                    self.screen.blit(j.image, j.position)
+                    j.blit(self.screen)
 
     def mouvementInterface(self, position, lastPosition, move_special):
 
