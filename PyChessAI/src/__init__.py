@@ -15,6 +15,7 @@ from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Players.enums import ModeDeJeu, TypePiece, MoveSpecial
 import easygui
+import sys
 
 class Chess():
     def __init__(self):
@@ -25,9 +26,6 @@ class Chess():
 
         #Déclaration des différents images
         self.echiquier = Image('echiquier', [0, 0])
-        self.modeDeJeu_buttons = [Bouton('homme-vs-homme', [0, 30 + 70 * 1]),
-                                  Bouton('homme-vs-machine', [0, 30 + 70 * 2]),
-                                  Bouton('machine-vs-machine',[0, 30 + 70 * 3])]
         self.undo_button = Bouton('undo', [self.echiquier.dimension[0] + 25, 125 + 40 * 5])
         self.list_button = Bouton('list-moves', [self.echiquier.dimension[1] + 25, 125 + 40 * 4])
 
@@ -51,12 +49,18 @@ class Chess():
         self.init_pygame()
 
     def main_loop(self):
-
         """
         Fonctionnement logique de la partie
         """
+        Opponents(self.mode_de_jeu.value, self.screen)
 
-        self.init_main()
+        self.screen.blit(self.echiquier.image, self.echiquier.position)
+        self.init_pieces()
+
+        self.screen.blit(self.undo_button.image, self.undo_button.position)
+        self.screen.blit(self.list_button.image, self.list_button.position)
+
+        pygame.display.flip()
 
         #Indique si la partie est terminée
         done = False
@@ -86,8 +90,11 @@ class Chess():
                             self.clickedVert(vert)
                             #si on clique sur le boutton undo (commentaire pour le if suivant)
                         elif Memoire.numero_move != 0 and self.undo_button.image.get_rect().move(self.undo_button.position[0], self.undo_button.position[1]).collidepoint(self.position_curseur):
-                            Memoire.undo(self.board)
-                            Memoire.undo(self.board)
+                            if self.mode_de_jeu == ModeDeJeu.JOUEUR_JOUEUR:
+                                Memoire.undo(self.board)
+                            else :
+                                Memoire.undo(self.board)
+                                Memoire.undo(self.board)
                             self.boardToInterface()
                         elif self.list_button.image.get_rect().move(self.list_button.position[0], self.list_button.position[1]).collidepoint(self.position_curseur):
                             easygui.textbox('Liste des moves','Liste',Memoire.tous_move)
@@ -123,54 +130,43 @@ class Chess():
         pygame.init()
         pygame.display.set_caption("Chess program")
 
-    def init_main(self):
-        """
-        Initialise la partie
-        """
-        Opponents(self.mode_de_jeu.value, self.screen)
-
-        self.screen.blit(self.echiquier.image, self.echiquier.position)
-        self.init_pieces()
-
-        self.screen.blit(self.undo_button.image, self.undo_button.position)
-        self.screen.blit(self.list_button.image, self.list_button.position)
-
-        pygame.display.flip()
-
-    def init_intro(self):
-
-        """
-        Initialise l'écran d'intro
-        """
-        self.screen.blit(self.modeDeJeu_buttons[0].image, self.modeDeJeu_buttons[0].position)
-        self.screen.blit(self.modeDeJeu_buttons[1].image, self.modeDeJeu_buttons[1].position)
-        self.screen.blit(self.modeDeJeu_buttons[2].image, self.modeDeJeu_buttons[2].position)
-        pygame.display.flip()
-
-
-
     def intro_loop(self):
-
         """
         Fonctionnement logique de l'intro
         """
+        choix = None
 
-        #Indique lorsqu'il faut quitter l'intro
-        done = False
+        HH_button = Bouton('homme-vs-homme', [(self.echiquier.dimension[0] - 50) / 2, 30 + 70 * 2])
+        HM_button = Bouton('homme-vs-machine', [(self.echiquier.dimension[0] - 50) / 2, 30 + 70 * 3])
+        MM_button = Bouton('machine-vs-machine', [(self.echiquier.dimension[0] - 50) / 2, 30 + 70 * 4])
 
-        self.init_intro()
+        police = pygame.font.SysFont('arial', 50)
+        message = police.render('Modes de jeu',1,(255,255,255))
 
-        while not done:
+        self.screen.blit(message,(self.echiquier.dimension[0]/2 -25,50))
+        self.screen.blit(HH_button.image, HH_button.position)
+        self.screen.blit(HM_button.image, HM_button.position)
+        self.screen.blit(MM_button.image, MM_button.position)
+
+        pygame.display.flip()
+
+        while choix is None:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    done = True
+                    sys.exit(0)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.positionCurseur = pygame.mouse.get_pos()
+                    self.position_curseur = pygame.mouse.get_pos()
 
-
+                    if HH_button.image.get_rect().move(HH_button.position[0], HH_button.position[1]).collidepoint(self.position_curseur):
+                        choix = ModeDeJeu.JOUEUR_JOUEUR
+                    elif HM_button.image.get_rect().move(HM_button.position[0], HM_button.position[1]).collidepoint(self.position_curseur):
+                        choix = ModeDeJeu.JOUEUR_MACHINE
+                    elif MM_button.image.get_rect().move(MM_button.position[0], MM_button.position[1]).collidepoint(self.position_curseur):
+                        choix = ModeDeJeu.MACHINE_MACHINE
 
         #Réinitialise l'écran en le remplissant avec du noir
         self.screen.fill((0,0,0))
+        self.mode_de_jeu = choix
 
     def clickedVert(self,vert):
         """
