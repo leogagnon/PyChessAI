@@ -1,10 +1,11 @@
 from Modele.Elements.pieceM import PieceM
 from Modele.Elements.tour import Tour
 import Modele
-#la classe Chevalier est une PieceM de type chevalier (c'est à dire que c'est l'équivalent de la pièce chevalier pour la mémoire)
-class Roi(PieceM):
 
-    #constructeur
+
+# la classe Chevalier est une PieceM de type chevalier (c'est à dire que c'est l'équivalent de la pièce chevalier pour la mémoire)
+class Roi(PieceM):
+    # constructeur
     def __init__(self, position, couleurBlanc):
         super().__init__(position, couleurBlanc, 200)
         self.moved = False
@@ -12,29 +13,31 @@ class Roi(PieceM):
     # voir où sa se fait override (pieceM possibiliteBouger)
     def possibiliteBouger(self, board):
         moves = [[False for _ in range(8)] for _ in range(8)]
-        direction = [-1,0,1]
+        direction = [-1, 0, 1]
         test = []
-        
+
         for i in direction:
             for j in direction:
                 if i != 0 or j != 0:
-                    test = [self.position[0]+ i, self.position[1]+j]
+                    test = [self.position[0] + i, self.position[1] + j]
                     if self.isInGame(test):
                         if board[test[0]][test[1]] == None:
                             moves[test[0]][test[1]] = True
                             if j == 0 and not self.moved:
-                                test = [self.position[0] + i*2, self.position[1]]
+                                test = [self.position[0] + i * 2, self.position[1]]
                                 if board[test[0]][test[1]] == None:
-                                    if i < 0 and board[test[0] - 1][test[1]] == None and isinstance(board[0][self.position[1]], Tour) and not board[0][self.position[1]].moved:
+                                    if i < 0 and board[test[0] - 1][test[1]] == None and isinstance(
+                                            board[0][self.position[1]], Tour) and not board[0][self.position[1]].moved:
                                         moves[test[0]][test[1]] = True
-                                    elif i > 0 and isinstance(board[7][self.position[1]], Tour) and not board[7][self.position[1]].moved:
+                                    elif i > 0 and isinstance(board[7][self.position[1]], Tour) and not board[7][
+                                        self.position[1]].moved:
                                         moves[test[0]][test[1]] = True
                         elif board[test[0]][test[1]].couleurBlanc != self.couleurBlanc:
                             moves[test[0]][test[1]] = True
         return moves
 
-    #Voir toutes les places qui sont touchés par un adversaire
-    #Va être essentiel pour la méthode echec dans la classe Roi
+    # Voir toutes les places qui sont touchés par un adversaire
+    # Va être essentiel pour la méthode echec dans la classe Roi
     def opponentMoves(self, board):
         moves = [[False for _ in range(8)] for _ in range(8)]
         adder = [[False for _ in range(8)] for _ in range(8)]
@@ -50,7 +53,7 @@ class Roi(PieceM):
 
         return moves
 
-    #Voir si votre roi est en état d'échec
+    # Voir si votre roi est en état d'échec
     def echec(self, board, couleurBlanc):
         positionRoi = PieceM.trouverRoi(board, couleurBlanc)
         others = self.opponentMoves(board)
@@ -58,7 +61,7 @@ class Roi(PieceM):
             return True
         return False
 
-    #voir si un move est acceptable (c'est-à dire est ce qu'en bougeant cela va faire en sorte qu'un roi qui n'est pas mat se mette en état d'échec)
+    # voir si un move est acceptable (c'est-à dire est ce qu'en bougeant cela va faire en sorte qu'un roi qui n'est pas mat se mette en état d'échec)
     def acceptableMove(self, moves, board, position):
         initial = position[:]
         erasedPiece = None
@@ -68,19 +71,19 @@ class Roi(PieceM):
                 if moves[i][j]:
                     if board[i][j] != None:
                         erasedPiece = board[i][j]
-                        self.testMouvementMemory([i,j], initial, board)
+                        self.testMouvementMemory([i, j], initial, board)
                         if self.echec(board, self.couleurBlanc):
                             moves[i][j] = False
-                        self.testMouvementMemory(initial, [i,j], board)
+                        self.testMouvementMemory(initial, [i, j], board)
                         board[i][j] = erasedPiece
                     else:
                         if isinstance(board[initial[0]][initial[1]], Modele.Elements.roi.Roi) and initial[0] == 4:
                             if moves[initial[0] + 2][initial[1]]:
                                 if self.echec(board, self.couleurBlanc):
-                                    moves[initial[0]+2][initial[1]] = False
+                                    moves[initial[0] + 2][initial[1]] = False
                                 elif not moves[initial[0] + 1][initial[1]]:
-                                    print(initial[0]+2)
-                                    moves[initial[0]+2][initial[1]] = False
+                                    print(initial[0] + 2)
+                                    moves[initial[0] + 2][initial[1]] = False
                             elif moves[initial[0] - 2][initial[1]]:
                                 if self.echec(board, self.couleurBlanc):
                                     moves[initial[0] - 2][initial[1]] = False
@@ -96,7 +99,7 @@ class Roi(PieceM):
                             moves[i][j] = False
                         self.testMouvementMemory(initial, [i, j], board)
 
-    #voir si une pièce peut au moins faire un move (utile pour la méthode mat)
+    # voir si une pièce peut au moins faire un move (utile pour la méthode mat)
     def onlyLegal(self, temp):
         taille = 8
         for i in range(taille):
@@ -105,11 +108,10 @@ class Roi(PieceM):
                     return True
         return False
 
-    #voir si le roi est en échec et mat
+    # voir si le roi est en échec et mat
     def mat(self, board):
         if not self.echec(board, self.couleurBlanc):
             return False
-
 
         for temp1 in board:
             for temp2 in temp1:
@@ -118,7 +120,5 @@ class Roi(PieceM):
                     self.acceptableMove(moves, board, temp2.position[:])
                     if self.onlyLegal(moves):
                         return False
-        
+
         return True
-    
-                

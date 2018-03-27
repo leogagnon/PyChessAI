@@ -1,6 +1,7 @@
 import pygame
 from abc import ABC, abstractmethod
 
+
 class Image(ABC):
     def __init__(self, nom, position):
         """
@@ -28,9 +29,8 @@ class Image(ABC):
         """
         self.dimension = self.image.get_rect().size
 
-    def blit(self,screen):
-        screen.blit(self.image,self.position)
-
+    def blit(self, screen):
+        screen.blit(self.image, self.position)
 
     @staticmethod
     def DIMENSION_CASE():
@@ -45,19 +45,3 @@ class Image(ABC):
         :return: Valeur du coin en bas à droite de l'échiquier
         """
         return [24, 350]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

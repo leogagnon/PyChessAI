@@ -1,9 +1,11 @@
 from enum import Enum
 
+
 class ModeDeJeu(Enum):
     JOUEUR_JOUEUR = 0
     JOUEUR_MACHINE = 1
     MACHINE_MACHINE = 2
+
 
 class TypePiece(Enum):
     CAVALIER = 'cavalier'
@@ -12,6 +14,7 @@ class TypePiece(Enum):
     REINE = 'reine'
     ROI = 'roi'
     TOUR = 'tour'
+
 
 class MoveSpecial(Enum):
     NULL = -1
@@ -22,11 +25,3 @@ class MoveSpecial(Enum):
     PREMIER_MOUVEMENT_ROI = 4
     PREMIER_MOUVEMENT_PION = 5
     PRISE_EN_PASSANT_IMPOSSIBLE = 6
-
-class TypeAI(Enum):
-    MINIMAX = 0
-    ALPHA_BETA = 1
-    NEURAL_NETWORK = 2
-    STOCKFISH = 3
-    ALPHA_ZERO = 4
-
