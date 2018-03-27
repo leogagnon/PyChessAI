@@ -16,10 +16,11 @@ class TypeAI(Enum):
 # Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)
 class Machine(Joueur, ABC):
     # constructeur
-    def __init__(self, couleur):
-        super().__init__(couleur)
+    def __init__(self, couleur, depth):
         self.position = None
         self.lastPosition = None
+        self.depth = depth
+        super().__init__(couleur)
 
     # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du AI sélectionner par l'usager
     @abstractclassmethod

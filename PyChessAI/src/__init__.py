@@ -53,7 +53,7 @@ class Chess():
         """
         Fonctionnement logique de la partie
         """
-        Game(self.mode_de_jeu, True, TypeAI.ALPHA_BETA,TypeAI.ALPHA_BETA)
+        Game(self.mode_de_jeu, True, TypeAI.STOCKFISH,10,TypeAI.ALPHA_BETA,2)
 
         self.echiquier.blit(self.screen)
         self.init_pieces()
@@ -103,7 +103,13 @@ class Chess():
                         elif self.list_button.image.get_rect().move(self.list_button.position[0],
                                                                     self.list_button.position[1]).collidepoint(
                             self.position_curseur):
-                            easygui.textbox('Liste des moves', 'Liste', Memoire.tous_move)
+
+                            liste_moves = ''
+
+                            for i in Memoire.tous_move:
+                                liste_moves += i + '\n'
+
+                            easygui.textbox('Liste des moves', 'Liste', liste_moves)
 
                         posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
                         if self.board[posRoi[0]][posRoi[1]].mat(self.board):
@@ -126,6 +132,9 @@ class Chess():
                     done = True
 
             pygame.display.flip()
+
+        while(True):
+            pass
 
     def init_pygame(self):
         """

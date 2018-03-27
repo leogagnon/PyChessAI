@@ -10,11 +10,11 @@ import copy  # pour pouvoir copier adéquatement la matrice board
 
 class AlphaBeta(Machine):
     # constructeur
-    def __init__(self, couleur):
-        super().__init__(couleur)
-        self.depth = 1
+    def __init__(self, couleur, depth):
         self.board = None
         self.bestScore = -300
+        super().__init__(couleur, depth)
+
 
     # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
     def evaluate(self, board):  # negatif if opponent is winning and positif if you are winning
@@ -39,15 +39,13 @@ class AlphaBeta(Machine):
 
     # play needs to call alphaBeta (since this is the AI in this case)
     def play(self, board):
-        # print(self.evaluate(board))
         self.board = copy.deepcopy(board)
         self.position = None
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
 
         pieceTemp = board[self.position[0]][self.position[1]]
-        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition,
-                                                                                    board)
+        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition, board)
         Modele.Elements.memoire.Memoire.move_made(self.position, self.lastPosition,
                                                   board[self.position[0]][self.position[1]], pieceTemp, special)
 

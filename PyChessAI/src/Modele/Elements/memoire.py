@@ -1,5 +1,4 @@
 import Modele
-from Modele.Players.game import Game
 from Modele.Players.enums import *
 
 
@@ -23,12 +22,12 @@ class Memoire:
         if manger is not None:
             Memoire.mange(manger)
         Memoire.numero_move += 1
-        Game.tour_blanc = not Game.tour_blanc
+        Modele.Players.game.Game.tour_blanc = not Modele.Players.game.Game.tour_blanc
 
     #normal means that it only saves what piece moved from where to where
     @staticmethod
     def normal(position, lastPosition, piece):
-        Memoire.tous_move.append(Memoire.transform(position, lastPosition, piece)+'\n')
+        Memoire.tous_move.append(Memoire.transform(position, lastPosition, piece))
 
     #its meant to transform a move to a String (exemple) ->   "T:a1-b2"
     @staticmethod
@@ -95,7 +94,7 @@ class Memoire:
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
         Memoire.numero_move -= 1
-        Game.tour_blanc = not Game.tour_blanc
+        Modele.Players.game.Game.tour_blanc = not Modele.Players.game.Game.tour_blanc
 
 
 
