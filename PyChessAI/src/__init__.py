@@ -46,11 +46,14 @@ class Chess():
         # Initialisation de la fenetre de PyGame
         self.init_pygame()
 
-    def main_loop(self):
+    def main(self):
+        pass
+
+    def game_loop(self):
         """
         Fonctionnement logique de la partie
         """
-        Game(self.mode_de_jeu, True, TypeAI.ALPHA_BETA)
+        Game(self.mode_de_jeu, True, TypeAI.ALPHA_BETA,TypeAI.ALPHA_BETA)
 
         self.echiquier.blit(self.screen)
         self.init_pieces()
@@ -59,12 +62,12 @@ class Chess():
 
         pygame.display.flip()
 
-        # Indique si la partie est terminée
+        #Indique si la partie est terminée
         done = False
-        # Boucle principale
+
+        #Boucle principale
         while not done:
             if isinstance(Game.get_tour(), Humain):
-                # Passe à travers tout les events détectés par PyGame
                 for event in pygame.event.get():
                     pieceTemp = None
                     if event.type == pygame.QUIT:
@@ -90,7 +93,7 @@ class Chess():
                             # si on clique sur le boutton undo (commentaire pour le if suivant)
                         elif Memoire.numero_move != 0 and self.undo_button.image.get_rect().move(
                                 self.undo_button.position[0], self.undo_button.position[1]).collidepoint(
-                                self.position_curseur):
+                            self.position_curseur):
                             if self.mode_de_jeu == ModeDeJeu.JOUEUR_JOUEUR:
                                 Memoire.undo(self.board)
                             else:
@@ -99,7 +102,7 @@ class Chess():
                             self.boardToInterface()
                         elif self.list_button.image.get_rect().move(self.list_button.position[0],
                                                                     self.list_button.position[1]).collidepoint(
-                                self.position_curseur):
+                            self.position_curseur):
                             easygui.textbox('Liste des moves', 'Liste', Memoire.tous_move)
 
                         posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
@@ -123,7 +126,6 @@ class Chess():
                     done = True
 
             pygame.display.flip()
-        pygame.display.quit()
 
     def init_pygame(self):
         """
@@ -133,12 +135,17 @@ class Chess():
         pygame.init()
         pygame.display.set_caption("Chess program")
 
+    def outro_loop(self):
+        """
+        Fonctionnement logique de la conclusion
+        """
+
     def init_timer(self, pos):
         pass
 
     def intro_loop(self):
         """
-        Fonctionnement logique de l'intro
+        Fonctionnement logique de l'introduction
         """
         choix = None
 
@@ -158,6 +165,7 @@ class Chess():
 
         pygame.display.flip()
 
+        #Boucle principale
         while choix is None:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -175,7 +183,7 @@ class Chess():
                             self.position_curseur):
                         choix = ModeDeJeu.MACHINE_MACHINE
 
-        # Réinitialise l'écran en le remplissant avec du noir
+        #Réinitialise l'écran en le remplissant avec du noir
         self.screen.fill((0, 0, 0))
         self.mode_de_jeu = choix
 
@@ -351,4 +359,4 @@ class Chess():
 
 chess_init = Chess()
 chess_init.intro_loop()
-chess_init.main_loop()
+chess_init.game_loop()

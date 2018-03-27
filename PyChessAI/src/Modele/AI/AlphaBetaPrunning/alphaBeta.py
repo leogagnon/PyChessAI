@@ -12,7 +12,7 @@ class AlphaBeta(Machine):
     # constructeur
     def __init__(self, couleur):
         super().__init__(couleur)
-        self.depth = 3
+        self.depth = 1
         self.board = None
         self.bestScore = -300
 

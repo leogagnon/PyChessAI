@@ -17,25 +17,34 @@ class Game():
         Game.gameMode = mode_de_jeu
         Game.initPlayers(choix_couleur, AI_1, AI_2)
 
-    # this tell which player is going to be a Machine and which are going to be a humain
     @staticmethod
     def initPlayers(choix_couleur, AI_1, AI_2):
-
+        '''
+        Initialise les deux joueurs
+        :param choix_couleur: Couleur choisise par le joueur (Seulement utile pour JOUEUR_MACHINE)
+        :param AI_1: Type du premier AI
+        :param AI_2: Type du deuxième AI
+        '''
 
         if Game.gameMode is ModeDeJeu.JOUEUR_JOUEUR:
             Game.joueur_1 = Humain(False)
             Game.joueur_2 = Humain(True)
         elif Game.gameMode is ModeDeJeu.JOUEUR_MACHINE:
             Game.joueur_1 = Humain(choix_couleur)
-            Game.joueur_2 = Game.init_ai(AI_1,not choix_couleur)
+            Game.joueur_2 = Game.init_ai(AI_1, not choix_couleur)
         elif Game.gameMode is ModeDeJeu.MACHINE_MACHINE:
-            Game.joueur_1 = Game.init_ai(AI_1,choix_couleur)
-            Game.joueur_2 = Game.init_ai(AI_2,not choix_couleur)
+            Game.joueur_1 = Game.init_ai(AI_1, choix_couleur)
+            Game.joueur_2 = Game.init_ai(AI_2, not choix_couleur)
 
-    # Cette méthode va faire en sorte que nous pouvons savoir quel type de AI jouera
     @staticmethod
     def init_ai(type_ai, couleur):
 
+        """
+        Initialise un AI et le retourne
+        :param type_ai: Type du AI
+        :param couleur: Couleur du AI
+        :return: Un objet machine (Le AI)
+        """
         if type_ai is TypeAI.MINIMAX:
             return
         elif type_ai is TypeAI.ALPHA_BETA:
@@ -47,11 +56,12 @@ class Game():
         elif type_ai is TypeAI.ALPHA_ZERO:
             return
 
-
-
-    # Va sortir le player à qui c'est le tour
     @staticmethod
     def get_tour():
+        """
+        Indique à qui est le tour
+        :return: Revoie un objet Joueur()
+        """
         if Game.joueur_1.COULEUR_BLANC is Game.tour_blanc:
             return Game.joueur_1
         return Game.joueur_2

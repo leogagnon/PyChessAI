@@ -30,6 +30,10 @@ class Image(ABC):
         self.dimension = self.image.get_rect().size
 
     def blit(self, screen):
+        """
+        Affiche l'image sur l'écran
+        :param screen: Écran sur laquelle afficher
+        """
         screen.blit(self.image, self.position)
 
     @staticmethod

@@ -10,7 +10,7 @@ class Humain(Joueur):
         super().__init__(couleurBlanc)
 
     # demander à l'utilisateur qu'elle pièce prendre la place du pion qui est en train d'avoir une promotion
-    def choixPromotion(self, board, position):
+    def choix_promotion(self, board, position):
 
         options = ['Reine', 'Tour', 'Fou', 'Cavalier']
         msg = 'Choisissez la promotion'

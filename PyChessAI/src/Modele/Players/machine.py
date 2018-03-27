@@ -27,5 +27,5 @@ class Machine(Joueur, ABC):
         pass
 
     # Cela dit que le choix que le AI fait pour la promotion est une dame (dans les games sérieuses c'est 99% du temps un dame)
-    def choixPromotion(self, board, position, screen):
+    def choix_promotion(self, board, position):
         return Pion.getChoices()[0]
