@@ -1,4 +1,4 @@
-from Modele.Players.machine import Machine
+from Modele.Game.machine import Machine
 from Modele.AI.NeuronNetwork.network import Network
 
 class NeuralMachine(Machine):

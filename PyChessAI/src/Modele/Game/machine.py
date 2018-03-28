@@ -1,4 +1,4 @@
-from Modele.Players.joueur import Joueur
+from Modele.Game.joueur import Joueur
 from Modele.Elements.pion import Pion
 from abc import ABC, abstractclassmethod
 from enum import Enum
@@ -6,11 +6,11 @@ import Modele
 
 
 class TypeAI(Enum):
-    MINIMAX = 0
-    ALPHA_BETA = 1
-    NEURAL_NETWORK = 2
-    STOCKFISH = 3
-    ALPHA_ZERO = 4
+    MINIMAX = 'Minimax'
+    ALPHA_BETA = 'MiniMax avec étalonage alpha-bêta'
+    NEURAL_NETWORK = 'Neural Network'
+    STOCKFISH = 'Stockfish9'
+    ALPHA_ZERO = 'Alpha Zero (Google)'
 
 
 # Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)

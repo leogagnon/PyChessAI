@@ -1,8 +1,8 @@
 import Modele
-from Modele.Players.enums import *
+from Modele.Game.enums import *
 
 
-#cette classe est utile pour undo (ce qui sera utile dans chaque gameMode)
+#cette classe est utile pour undo (ce qui sera utile dans chaque mode_de_jeu)
 #les deux méthode qui vont être utile en dehors de la classe sont move_made et undo
 
 
@@ -22,7 +22,7 @@ class Memoire:
         if manger is not None:
             Memoire.mange(manger)
         Memoire.numero_move += 1
-        Modele.Players.game.Game.tour_blanc = not Modele.Players.game.Game.tour_blanc
+        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
 
     #normal means that it only saves what piece moved from where to where
     @staticmethod
@@ -94,7 +94,7 @@ class Memoire:
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
         Memoire.numero_move -= 1
-        Modele.Players.game.Game.tour_blanc = not Modele.Players.game.Game.tour_blanc
+        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
 
 
 

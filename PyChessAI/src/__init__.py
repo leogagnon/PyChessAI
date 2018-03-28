@@ -6,18 +6,16 @@ from Modele.Elements.roi import Roi
 from Modele.Elements.reine import Reine
 from Modele.Elements.chevalier import Chevalier
 from Modele.Elements.fou import Fou
-from Modele.Elements.pion import Pion
 from Vue.piece import Piece
 from Vue.vert import Vert
 import Modele
-from Modele.Players.machine import Machine
-from Modele.Players.machine import TypeAI
-from Modele.Players.game import Game
+from Modele.Game.machine import TypeAI
+from Modele.Game.game import Game
 from Modele.Elements.memoire import Memoire
 from Vue.bouton import Bouton
 from Vue.image import Image
-from Modele.Players.humain import Humain
-from Modele.Players.enums import ModeDeJeu, TypePiece, MoveSpecial
+from Modele.Game.humain import Humain
+from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
 import easygui
 import sys
 
@@ -53,7 +51,8 @@ class Chess():
         """
         Fonctionnement logique de la partie
         """
-        Game(self.mode_de_jeu, True, TypeAI.STOCKFISH,10,TypeAI.ALPHA_BETA,2)
+
+        Game(self.mode_de_jeu, True, AI_1=TypeAI.ALPHA_BETA, depth_1=2, AI_2=TypeAI.STOCKFISH, depth_2=2)
 
         self.echiquier.blit(self.screen)
         self.init_pieces()
@@ -62,12 +61,12 @@ class Chess():
 
         pygame.display.flip()
 
-        #Indique si la partie est terminée
+        # Indique si la partie est terminée
         done = False
 
-        #Boucle principale
+        # Boucle principale
         while not done:
-            if isinstance(Game.get_tour(), Humain):
+            if isinstance(Game.get_active_player(), Humain):
                 for event in pygame.event.get():
                     pieceTemp = None
                     if event.type == pygame.QUIT:
@@ -123,7 +122,7 @@ class Chess():
                 if self.board[posRoi[0]][posRoi[1]].mat(self.board):
                     done = True
 
-                Game.get_tour().play(self.board)
+                Game.get_active_player().play(self.board)
                 self.boardToInterface()
 
                 # voir si le joueur est mat ou sinon il peut pas jouer
@@ -133,7 +132,7 @@ class Chess():
 
             pygame.display.flip()
 
-        while(True):
+        while (True):
             pass
 
     def init_pygame(self):
@@ -174,7 +173,7 @@ class Chess():
 
         pygame.display.flip()
 
-        #Boucle principale
+        # Boucle principale
         while choix is None:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -192,9 +191,11 @@ class Chess():
                             self.position_curseur):
                         choix = ModeDeJeu.MACHINE_MACHINE
 
-        #Réinitialise l'écran en le remplissant avec du noir
-        self.screen.fill((0, 0, 0))
+
+
+
         self.mode_de_jeu = choix
+        self.screen.fill((0, 0, 0))
 
     def clickedVert(self, vert):
         """
@@ -263,7 +264,7 @@ class Chess():
                     elif isinstance(self.board[i][j], Chevalier):
                         self.liste_piece[i][j] = Piece("cavalier", self.board[i][j].couleurBlanc,
                                                        self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Modele.Players.machine.Pion):
+                    elif isinstance(self.board[i][j], Modele.Game.machine.Pion):
                         self.liste_piece[i][j] = Piece("pion", self.board[i][j].couleurBlanc, self.board[i][j].position)
         self.nouveau()
 
@@ -305,8 +306,8 @@ class Chess():
                 self.board[i][0], self.board[colum_reflechi][0] = Reine([i, 0], True), Roi([colum_reflechi, 0], True)
                 self.board[i][7], self.board[colum_reflechi][7] = Reine([i, 7], False), Roi([colum_reflechi, 7], False)
         for i in range(8):
-            self.board[i][1] = Modele.Players.machine.Pion([i, 1], True)
-            self.board[i][6] = Modele.Players.machine.Pion([i, 6], False)
+            self.board[i][1] = Modele.Game.machine.Pion([i, 1], True)
+            self.board[i][6] = Modele.Game.machine.Pion([i, 6], False)
 
         ordre = [TypePiece.TOUR,
                  TypePiece.CAVALIER,
@@ -344,13 +345,13 @@ class Chess():
             inputs = ""
 
             if isinstance(self.board[position[0]][position[1]], Reine):
-                inputs = Modele.Players.machine.Pion.getChoices()[0]
+                inputs = Modele.Game.machine.Pion.getChoices()[0]
             elif isinstance(self.board[position[0]][position[1]], Tour):
-                inputs = Modele.Players.machine.Pion.getChoices()[1]
+                inputs = Modele.Game.machine.Pion.getChoices()[1]
             elif isinstance(self.board[position[0]][position[1]], Fou):
-                inputs = Modele.Players.machine.Pion.getChoices()[2]
+                inputs = Modele.Game.machine.Pion.getChoices()[2]
             elif isinstance(self.board[position[0]][position[1]], Chevalier):
-                inputs = Modele.Players.machine.Pion.getChoices()[3]
+                inputs = Modele.Game.machine.Pion.getChoices()[3]
             tempPiece = Piece(inputs.name, self.liste_piece[position[0]][position[1]].estBlanc, position)
             self.liste_piece[position[0]][position[1]] = tempPiece
         elif move_special == MoveSpecial.ROQUE:

@@ -4,7 +4,7 @@ from Modele.Elements.reine import Reine
 from Modele.Elements.fou import Fou
 from Modele.Elements.chevalier import Chevalier
 from Modele.Elements.pieceM import PieceM
-from Modele.Players.enums import *
+from Modele.Game.enums import *
 
 
 # la classe Chevalier est une PieceM de type chevalier (c'est à dire que c'est l'équivalent de la pièce chevalier pour la mémoire)

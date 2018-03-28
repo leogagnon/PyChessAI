@@ -2,7 +2,7 @@
 import Modele
 from abc import ABC, abstractmethod
 import Modele
-from Modele.Players.enums import *
+from Modele.Game.enums import *
 
 class PieceM(ABC):
     #constructeur
@@ -53,7 +53,7 @@ class PieceM(ABC):
 
         if isinstance(board[position[0]][position[1]], Modele.Elements.pion.Pion):
             if position[1] == 7 or position[1] == 0:
-                output = Modele.Players.game.Game.get_tour().choix_promotion(None, None)
+                output = Modele.Game.game.Game.get_active_player().choix_promotion(None, None)
                 board[position[0]][position[1]].promotion(output, board)
                 special = MoveSpecial.PROMOTION
         elif isinstance(board[position[0]][position[1]], Modele.Elements.tour.Tour):

@@ -1,4 +1,4 @@
-from Modele.Players.joueur import Joueur
+from Modele.Game.joueur import Joueur
 from Modele.Elements.pion import Pion
 import easygui
 

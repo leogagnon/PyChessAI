@@ -1,4 +1,4 @@
-from Modele.Players.machine import \
+from Modele.Game.machine import \
     Machine  # le Machine est utile vu que Alpha Beta est un Machine et que je veux que celui-ci puisse avoir les caractéristiques minimales pour faire un mouvement
 import Modele
 from Modele.Elements.pieceM import PieceM
@@ -9,12 +9,10 @@ import copy  # pour pouvoir copier adéquatement la matrice board
 # C'est le plus simple et c'est l'implémentation d'un algorithme assez connu (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
 
 class AlphaBeta(Machine):
-    # constructeur
     def __init__(self, couleur, depth):
         self.board = None
         self.bestScore = -300
         super().__init__(couleur, depth)
-
 
     # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
     def evaluate(self, board):  # negatif if opponent is winning and positif if you are winning
@@ -45,7 +43,8 @@ class AlphaBeta(Machine):
         self.alphaBetaMax(-300, 300, self.depth)
 
         pieceTemp = board[self.position[0]][self.position[1]]
-        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition, board)
+        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition,
+                                                                                    board)
         Modele.Elements.memoire.Memoire.move_made(self.position, self.lastPosition,
                                                   board[self.position[0]][self.position[1]], pieceTemp, special)
 
