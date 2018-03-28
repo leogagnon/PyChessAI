@@ -6,7 +6,7 @@ import Modele
 
 class Stockfish9(Machine):
     def __init__(self, couleur, depth):
-        self.stockfish = Stockfish(path='Modele/AI/Stockfish9/stockfish', depth=depth)
+        self.stockfish = Stockfish(path='Modele/AI/Stockfish9/stockfish_9_x64', depth=depth)
         super().__init__(couleur, depth)
 
     def play(self, board):
