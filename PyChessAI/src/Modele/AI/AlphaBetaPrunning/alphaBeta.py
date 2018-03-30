@@ -12,7 +12,8 @@ class AlphaBeta(Machine):
     def __init__(self, couleur, depth):
         self.board = None
         self.bestScore = -300
-        super().__init__(couleur, depth)
+        self.depth = depth
+        super().__init__(couleur)
 
     # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
     def evaluate(self, board):  # negatif if opponent is winning and positif if you are winning

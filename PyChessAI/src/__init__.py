@@ -41,6 +41,9 @@ class Chess():
         # Indique le mode de jeu choisi (par défaut JOUEUR_JOUEUR)
         self.mode_de_jeu = ModeDeJeu.JOUEUR_JOUEUR
 
+
+
+
         # Initialisation de la fenetre de PyGame
         self.init_pygame()
 
@@ -51,8 +54,7 @@ class Chess():
         """
         Fonctionnement logique de la partie
         """
-
-        Game(self.mode_de_jeu, True, AI_1=TypeAI.ALPHA_BETA, depth_1=2, AI_2=TypeAI.STOCKFISH, depth_2=2)
+        Game(self.mode_de_jeu, True, AI_1=TypeAI.LCZERO, depth_1=None, AI_2=TypeAI.ALPHA_BETA, depth_2=2)
 
         self.echiquier.blit(self.screen)
         self.init_pieces()
@@ -110,30 +112,23 @@ class Chess():
 
                             easygui.textbox('Liste des moves', 'Liste', liste_moves)
 
-                        posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
-                        if self.board[posRoi[0]][posRoi[1]].mat(self.board):
-                            done = True
-
 
 
             else:
-                # pour voir s'il est en mat en premier ou sinon erreur
-                posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
-                if self.board[posRoi[0]][posRoi[1]].mat(self.board):
-                    done = True
-
                 Game.get_active_player().play(self.board)
                 self.boardToInterface()
 
-                # voir si le joueur est mat ou sinon il peut pas jouer
-                posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
-                if self.board[posRoi[0]][posRoi[1]].mat(self.board):
-                    done = True
-
+            done = self.check_mat()
             pygame.display.flip()
 
         while (True):
             pass
+
+    def check_mat(self):
+        posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
+        if self.board[posRoi[0]][posRoi[1]].mat(self.board):
+            return True
+        return False
 
     def init_pygame(self):
         """
@@ -190,9 +185,6 @@ class Chess():
                     elif MM_button.image.get_rect().move(MM_button.position[0], MM_button.position[1]).collidepoint(
                             self.position_curseur):
                         choix = ModeDeJeu.MACHINE_MACHINE
-
-
-
 
         self.mode_de_jeu = choix
         self.screen.fill((0, 0, 0))

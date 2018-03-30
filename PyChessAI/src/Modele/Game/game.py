@@ -3,8 +3,8 @@ from Modele.Game.machine import Machine
 from Modele.AI.AlphaBetaPrunning.alphaBeta import AlphaBeta
 from Modele.Game.enums import *
 from Modele.Game.machine import TypeAI
-from Modele.AI.Stockfish9.stockfish9 import Stockfish9
-
+from Modele.AI.Stockfish9.stockfish import Stockfish
+from Modele.AI.LeelaChessZero.lczero import LCZero
 
 class Game():
     """Classe contenant les informations nécéssaires au déroulement d'une partie"""
@@ -55,9 +55,11 @@ class Game():
         elif type_ai is TypeAI.NEURAL_NETWORK:
             return #NeuralNetwork(couleur)
         elif type_ai is TypeAI.STOCKFISH:
-            return Stockfish9(couleur,depth)
+            return Stockfish(couleur, depth)
         elif type_ai is TypeAI.ALPHA_ZERO:
             return #AlphaZero(couleur)
+        elif type_ai is TypeAI.LCZERO:
+            return LCZero(couleur)
 
     @staticmethod
     def get_active_player():
