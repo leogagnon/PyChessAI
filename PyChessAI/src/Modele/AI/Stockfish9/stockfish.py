@@ -6,7 +6,7 @@ from Modele.AI.ucip import UCIP
 
 class Stockfish(Machine):
     def __init__(self, couleur, depth):
-        self.stockfish = UCIP(command=['Modele/AI/Stockfish9/stockfish_9_x64'], depth=depth)
+        self.stockfish = UCIP(command=['Modele/AI/Stockfish9/stockfish9Engine'], depth=depth)
         super().__init__(couleur)
 
     def play(self, board):
