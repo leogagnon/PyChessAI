@@ -23,3 +23,27 @@ class MoveSpecial(Enum):
     PREMIER_MOUVEMENT_PION = 5
     PRISE_EN_PASSANT_IMPOSSIBLE = 6
 
+class ChessNotation(Enum):
+    ROI = "K"
+    DAME = "Q"
+    TOUR = "R"
+    FOU = "B"
+    CAVALIER = "N"
+    ECHEC = "+"
+    MAT = "#"
+    PETITROQUE = "O-O"
+    GRANDROQUE = "O-O-O"
+    MANGER = "x"
+    PROMOTION = "="
+
+class PieceChess(Enum):
+    NONE = 0
+    PION = 1
+    CAVALIER = 2
+    FOU = 3
+    TOUR = 4
+    REINE = 5
+    ROI = 6
+
+
+

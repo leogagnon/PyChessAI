@@ -61,7 +61,6 @@ class Roi(PieceM):
     #voir si un move est acceptable (c'est-à dire est ce qu'en bougeant cela va faire en sorte qu'un roi qui n'est pas mat se mette en état d'échec)
     def acceptableMove(self, moves, board, position):
         initial = position[:]
-        erasedPiece = None
 
         for i in range(len(moves)):
             for j in range(len(moves[i])):

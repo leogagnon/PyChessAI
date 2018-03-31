@@ -1,5 +1,5 @@
 from Modele.Players.cpu import Cpu
-from Modele.AI.NeuronNetwork.network import Network
+from Modele.AI.NeuralNetwork.network import Network
 
 class NeuralCpu(Cpu):
     def __init__(self, couleur):

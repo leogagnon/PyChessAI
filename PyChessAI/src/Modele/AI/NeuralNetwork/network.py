@@ -1,4 +1,4 @@
-from Modele.AI.NeuronNetwork.perceptrons import Perceptrons
+from Modele.AI.NeuralNetwork.perceptrons import Perceptrons
 
 
 class Network:
@@ -21,7 +21,6 @@ class Network:
 
     def documentInterpreter(self, board, move, couleur):
         position = None
-
 
         if move == "O-O":
             position = []
