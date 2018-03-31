@@ -1,7 +1,7 @@
-from Modele.Players.cpu import Cpu
-from Modele.AI.NeuralNetwork.network import Network
+from Modele.Game.machine import Machine
+from Modele.AI.NeuronNetwork.network import Network
 
-class NeuralCpu(Cpu):
+class NeuralMachine(Machine):
     def __init__(self, couleur):
         super().__init__(couleur)
         self.nn = Network(5)

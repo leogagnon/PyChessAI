@@ -1,28 +1,19 @@
 import Modele
-from Modele.Players.opponents import Opponents
-from Modele.Players.enums import *
+from Modele.Game.enums import *
 
 
-#cette classe est utile pour undo (ce qui sera utile dans chaque gameMode)
+#cette classe est utile pour undo (ce qui sera utile dans chaque mode_de_jeu)
 #les deux méthode qui vont être utile en dehors de la classe sont move_made et undo
 
 
 class Memoire:
+
     memoireSpecial = [] # conserve [le # du move special, le numero_move]
-
-    # bouger va faire en sorte de déplacer visuellement l'objet, même les mouvements spéciaux, comme le roque,etc
-    # special = 0 -> prise en passant
-    # special = 1 -> promotion
-    # special = 2 -> roque
-    # special = 3 -> mouvement de la tour
-
     memoireManger = [] # conserve [la pièce mangé, le numero_move]
     numero_move = 0
     tous_move = [] # va n'être qu'un array de String qui va conserver toute les informations de quelle pièce a bouger de où à où
-    #(exemple) ->   "T:a1-b1"
 
-    #this is to indicate that a move has been made so we have to save the move made and all of it's characteristics
-    # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo 
+    # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo
     @staticmethod
     def move_made(position, lastPosition, piece, manger, special):
         Memoire.normal(position, lastPosition, piece)
@@ -31,7 +22,7 @@ class Memoire:
         if manger is not None:
             Memoire.mange(manger)
         Memoire.numero_move += 1
-        Opponents.tour_blanc = not Opponents.tour_blanc
+        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
 
     #normal means that it only saves what piece moved from where to where
     @staticmethod
@@ -103,7 +94,7 @@ class Memoire:
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
         Memoire.numero_move -= 1
-        Opponents.tour_blanc = not Opponents.tour_blanc
+        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
 
 
 

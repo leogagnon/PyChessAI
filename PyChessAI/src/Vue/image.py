@@ -1,6 +1,7 @@
 import pygame
 from abc import ABC, abstractmethod
 
+
 class Image(ABC):
     def __init__(self, nom, position):
         """
@@ -8,7 +9,6 @@ class Image(ABC):
         :param nom: Nom de l'image
         :param position: Position (largeur,hauteur) en pixel
         """
-
         self.nom = nom
         self.position = position
         self.image = None
@@ -19,6 +19,7 @@ class Image(ABC):
     def init_image(self):
         """
         Initialise l'image
+        Est overide dans toutes les classes filles
         """
         self.image = pygame.image.load("Vue\images\\" + self.nom + ".png")
 
@@ -27,6 +28,13 @@ class Image(ABC):
         Initialise les dimentions de l'image
         """
         self.dimension = self.image.get_rect().size
+
+    def blit(self, screen):
+        """
+        Affiche l'image sur l'écran
+        :param screen: Écran sur laquelle afficher
+        """
+        screen.blit(self.image, self.position)
 
     @staticmethod
     def DIMENSION_CASE():
@@ -41,19 +49,3 @@ class Image(ABC):
         :return: Valeur du coin en bas à droite de l'échiquier
         """
         return [24, 350]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
