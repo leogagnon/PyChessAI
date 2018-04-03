@@ -8,67 +8,47 @@ from Modele.Game.enums import *
 
 class Memoire:
 
-    memoireSpecial = [] # conserve [le # du move special, le numero_move]
-    memoireManger = [] # conserve [la pièce mangé, le numero_move]
-    numero_move = 0
-    tous_move = [] # va n'être qu'un array de String qui va conserver toute les informations de quelle pièce a bouger de où à où
+    def __init__(self):
+        self.memoireSpecial = []  # conserve [le # du move special, le numero_move]
+        self.memoireManger = []  # conserve [la pièce mangé, le numero_move]
+        self.numero_move = 0
+        self.tous_move = []  # va n'être qu'un array de String qui va conserver toute les informations de quelle pièce a bouger de où à où
 
     # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo
-    @staticmethod
-    def move_made(position, lastPosition, piece, manger, special):
-        Memoire.normal(position, lastPosition, piece)
+    def move_made(self,position, lastPosition, piece, manger, special):
+        self.normal(position, lastPosition, piece)
         if special != MoveSpecial.NULL:
-            Memoire.special(special)
+            self.special(special)
         if manger is not None:
-            Memoire.mange(manger)
-        Memoire.numero_move += 1
-        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
+            self.mange(manger)
+        self.numero_move += 1
 
     #normal means that it only saves what piece moved from where to where
-    @staticmethod
-    def normal(position, lastPosition, piece):
-        Memoire.tous_move.append(Memoire.transform(position, lastPosition, piece))
+    def normal(self, position, lastPosition, piece):
+        self.tous_move.append(Memoire.transform(position, lastPosition, piece))
 
-    #its meant to transform a move to a String (exemple) ->   "T:a1-b2"
-    @staticmethod
-    def transform(position, lastPosition, piece):
-        letter = ' '
-        if isinstance(piece, Modele.Elements.roi.Roi):
-            letter = 'R'
-        elif isinstance(piece, Modele.Elements.reine.Reine):
-            letter = 'D'
-        elif isinstance(piece, Modele.Elements.tour.Tour):
-            letter = 'T'
-        elif isinstance(piece, Modele.Elements.chevalier.Chevalier):
-            letter = 'C'
-        elif isinstance(piece, Modele.Elements.fou.Fou):
-            letter = 'F'
-        else:
-            letter = 'P'
-        return letter + ":" + chr(ord('a') + lastPosition[0]) + str(lastPosition[1] + 1) + "-" + chr(ord('a')+position[0]) + str(position[1]+1)
     #saves a eaten piece
-    @staticmethod
-    def mange(piece):
-        Memoire.memoireManger.append([piece, Memoire.numero_move])
+    def mange(self, piece):
+        self.memoireManger.append([piece, self.numero_move])
     #saves a special moves (roque, prise en passant et promotion)
-    @staticmethod
-    def special(special):
-        Memoire.memoireSpecial.append([special, Memoire.numero_move])
+    def special(self, special):
+        self.memoireSpecial.append([special, self.numero_move])
     #faire le changement dans la matrice board qui défait le dernier move fait
-    @staticmethod
-    def undo(board):
-        informations = Memoire.undo_transform(Memoire.tous_move.pop()) #lastPosition, position, piece qui a été bouger
+
+    def undo(self, board):
+
+        informations = self.undo_transform(self.tous_move.pop()) #lastPosition, position, piece qui a été bouger
         lastPosition, position, pieceBouger = informations[0], informations[1], informations[2]
 
         tempPiece = None
-        if len(Memoire.memoireManger) != 0 and Memoire.memoireManger[-1][1] == Memoire.numero_move - 1:
-            tempPiece = Memoire.memoireManger.pop()[0]
+        if len(self.memoireManger) != 0 and self.memoireManger[-1][1] == self.numero_move - 1:
+            tempPiece = self.memoireManger.pop()[0]
         board[position[0]][position[1]] = tempPiece
         board[lastPosition[0]][lastPosition[1]] = pieceBouger
         board[lastPosition[0]][lastPosition[1]].position = lastPosition[:]
 
-        if len(Memoire.memoireSpecial) != 0 and Memoire.memoireSpecial[-1][1] == Memoire.numero_move - 1:
-            special = Memoire.memoireSpecial.pop()[0]
+        if len(self.memoireSpecial) != 0 and self.memoireSpecial[-1][1] == self.numero_move - 1:
+            special = self.memoireSpecial.pop()[0]
             if special == MoveSpecial.PRISE_EN_PASSANT:#prise en passant
                 board[position[0]][lastPosition[1]] = Modele.Elements.pion.Pion([position[0], lastPosition[1]], not pieceBouger.couleurBlanc)
                 board[position[0]][lastPosition[1]].first = False
@@ -93,34 +73,30 @@ class Memoire:
                 board[lastPosition[0]][lastPosition[1]].second = True
             elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE: #the pawn could do his second move
                 board[lastPosition[0]][lastPosition[1]].second = True
-        Memoire.numero_move -= 1
-        Modele.Game.game.Game.tour_blanc = not Modele.Game.game.Game.tour_blanc
-
-
+        self.numero_move -= 1
 
     #prendre le string qui a été noté et output le move qui a été fait et avec quelle pièce
-    @staticmethod
-    def undo_transform(string_move):
+    def undo_transform(self, string_move):
         piece_string, move = string_move.split(":")
         lastPosition_string, position_string = move.split("-")
 
-        lastPosition, position = Memoire.cipher(lastPosition_string), Memoire.cipher(position_string)
+        lastPosition, position = self.cipher(lastPosition_string), self.cipher(position_string)
 
         pieceTemp = None
         if piece_string == "T":
-            pieceTemp = Modele.Elements.tour.Tour(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.tour.Tour(lastPosition, self.numero_move%2 == 1)
             pieceTemp.moved = True
         elif piece_string == "R":
-            pieceTemp = Modele.Elements.roi.Roi(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.roi.Roi(lastPosition, self.numero_move%2 == 1)
             pieceTemp.moved = True
         elif piece_string == "D":
-            pieceTemp = Modele.Elements.reine.Reine(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.reine.Reine(lastPosition, self.numero_move%2 == 1)
         elif piece_string == "C":
-            pieceTemp = Modele.Elements.chevalier.Chevalier(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.chevalier.Chevalier(lastPosition, self.numero_move%2 == 1)
         elif piece_string == "F":
-            pieceTemp = Modele.Elements.fou.Fou(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.fou.Fou(lastPosition, self.numero_move%2 == 1)
         elif piece_string == "P":
-            pieceTemp = Modele.Elements.pion.Pion(lastPosition, Memoire.numero_move%2 == 1)
+            pieceTemp = Modele.Elements.pion.Pion(lastPosition, self.numero_move%2 == 1)
             pieceTemp.first = False
             pieceTemp.second = False
         return [lastPosition, position, pieceTemp]
@@ -129,6 +105,25 @@ class Memoire:
     @staticmethod
     def cipher(string_position):
         return [ord(string_position[0]) - ord('a'), int(string_position[1]) - 1]
+
+    # its meant to transform a move to a String (exemple) ->   "T:a1-b2"
+    @staticmethod
+    def transform(position, lastPosition, piece):
+        letter = ' '
+        if isinstance(piece, Modele.Elements.roi.Roi):
+            letter = 'R'
+        elif isinstance(piece, Modele.Elements.reine.Reine):
+            letter = 'D'
+        elif isinstance(piece, Modele.Elements.tour.Tour):
+            letter = 'T'
+        elif isinstance(piece, Modele.Elements.chevalier.Chevalier):
+            letter = 'C'
+        elif isinstance(piece, Modele.Elements.fou.Fou):
+            letter = 'F'
+        else:
+            letter = 'P'
+        return letter + ":" + chr(ord('a') + lastPosition[0]) + str(lastPosition[1] + 1) + "-" + chr(
+            ord('a') + position[0]) + str(position[1] + 1)
 
 
 

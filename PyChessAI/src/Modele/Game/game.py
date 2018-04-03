@@ -5,18 +5,21 @@ from Modele.Game.enums import *
 from Modele.Game.machine import TypeAI
 from Modele.AI.Stockfish9.stockfish import Stockfish
 from Modele.AI.LeelaChessZero.lczero import LCZero
-
-class Game():
+from Modele.Elements.memoire import Memoire
+class Game:
     """Classe contenant les informations nécéssaires au déroulement d'une partie"""
 
-    joueur_1 = None
-    joueur_2 = None
-    tour_blanc = True
-    mode_de_jeu = None
+
 
     def __init__(self, mode_de_jeu, choix_couleur, AI_1=None, depth_1=None, AI_2=None, depth_2=None):
 
-        Game.mode_de_jeu = mode_de_jeu
+        self.memoire = Memoire()
+        self.board = [[None for _ in range(8)] for _ in range(8)]
+
+        self.joueur_1 = None
+        self.joueur_2 = None
+        self.tour_blanc = True
+        self.mode_de_jeu = mode_de_jeu
         self.initPlayers(choix_couleur, AI_1, depth_1, AI_2, depth_2)
 
     def initPlayers(self,choix_couleur, AI_1, depth_1, AI_2, depth_2):
@@ -29,15 +32,15 @@ class Game():
         :param depth_2: Profondeur d'évaluation du deuxième AI
         '''
 
-        if Game.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
-            Game.joueur_1 = Humain(False)
-            Game.joueur_2 = Humain(True)
-        elif Game.mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
-            Game.joueur_1 = Humain(choix_couleur)
-            Game.joueur_2 = self.init_ai(AI_1, not choix_couleur, depth_1)
-        elif Game.mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
-            Game.joueur_1 = self.init_ai(AI_1, choix_couleur, depth_1)
-            Game.joueur_2 = self.init_ai(AI_2, not choix_couleur, depth_2)
+        if self.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
+            self.joueur_1 = Humain(False)
+            self.joueur_2 = Humain(True)
+        elif self.mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
+            self.joueur_1 = Humain(choix_couleur)
+            self.joueur_2 = self.init_ai(AI_1, not choix_couleur, depth_1)
+        elif self.mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
+            self.joueur_1 = self.init_ai(AI_1, choix_couleur, depth_1)
+            self.joueur_2 = self.init_ai(AI_2, not choix_couleur, depth_2)
 
     def init_ai(self, type_ai, couleur, depth):
 
@@ -61,12 +64,43 @@ class Game():
         elif type_ai is TypeAI.LCZERO:
             return LCZero(couleur)
 
-    @staticmethod
-    def get_active_player():
+    def get_active_player(self):
         """
         Indique à qui est le tour
         :return: Revoie un objet Joueur()
         """
-        if Game.joueur_1.COULEUR_BLANC is Game.tour_blanc:
-            return Game.joueur_1
-        return Game.joueur_2
+        if self.joueur_1.COULEUR_BLANC is self.tour_blanc:
+            return self.joueur_1
+        return self.joueur_2
+
+    def move(self, position, lastPosition, piece, manger, special):
+        """
+
+        :param lastPosition:
+        :param piece:
+        :param manger:
+        :param special:
+        :return:
+        """
+
+        self.memoire.move_made(position, lastPosition, piece, manger, special)
+        self.tour_blanc = not self.tour_blanc
+
+    def undo(self):
+
+        self.memoire.undo(self.board)
+        self.tour_blanc = not self.tour_blanc
+
+    def next(self):
+
+        player = self.get_active_player()
+        best_move = None
+
+        if (isinstance(player, Machine)):
+            lastPosition, position = player.play(self.board, self.memoire.tous_move)
+
+            pieceTemp = self.board[position[0]][position[1]]
+            special = self.board[lastPosition[0]][lastPosition[1]].mouvementMemory(position,lastPosition,self.board)
+            self.move(position, lastPosition,self.board[position[0]][position[1]], pieceTemp, special)
+        else:
+            print('Un humain a besoin de jouer avant la machine')

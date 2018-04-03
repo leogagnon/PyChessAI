@@ -24,7 +24,7 @@ class Machine(Joueur, ABC):
 
     # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du AI sélectionner par l'usager
     @abstractclassmethod
-    def play(self, board):
+    def play(self, board, tous_moves):
         pass
 
     # Cela dit que le choix que le AI fait pour la promotion est une dame (dans les games sérieuses c'est 99% du temps un dame)

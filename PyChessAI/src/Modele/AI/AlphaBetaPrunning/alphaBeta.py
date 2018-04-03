@@ -43,13 +43,7 @@ class AlphaBeta(Machine):
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
 
-        pieceTemp = board[self.position[0]][self.position[1]]
-        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition,
-                                                                                    board)
-        Modele.Elements.memoire.Memoire.move_made(self.position, self.lastPosition,
-                                                  board[self.position[0]][self.position[1]], pieceTemp, special)
-
-        return special
+        return (self.lastPosition,self.position)
 
     # Pour comprendre cela, il faut comprendre comment alphaBeta fonctionne, mais si vous vous êtes documenté c'est l'équivalent de ce l'adversaire pourrait jouer
 
