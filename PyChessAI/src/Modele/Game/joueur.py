@@ -9,8 +9,9 @@ class Joueur(ABC):
         self.COULEUR_BLANC = couleur_blanc
 
     #Chaqu'un doit avoir une façon de décider de son choix de promotion
+    @staticmethod
     @abstractmethod
-    def choix_promotion(self, board, position):
+    def choix_promotion():
         """
         Permet de décider le choix de promotion
         :param board: État du board

@@ -1,17 +1,21 @@
 from Modele.Game.machine import Machine
 from Modele.Elements.memoire import Memoire
-import Modele
+from Modele.Game.enums import *
 from Modele.AI.ucip import UCIP
 
 
 class LCZero(Machine):
     def __init__(self, couleur):
         self.lczero = UCIP(command=['Modele/AI/LeelaChessZero/lczeroEngine','-w','Modele/AI/LeelaChessZero/weights.txt'])
+        self.promotion = None
         super().__init__(couleur)
 
-    def play(self, board, tous_moves):
-            self.lczero.set_position(self.get_liste_moves(tous_moves))
+    def play(self, board, memoire):
+            self.lczero.set_position(self.get_liste_moves(memoire.tous_move))
             best_move = self.lczero.get_best_move()
+
+
+            best_move = best_move[:4]
 
             self.lastPosition = Memoire.cipher(best_move[:2])
             self.position = Memoire.cipher(best_move[-2:])

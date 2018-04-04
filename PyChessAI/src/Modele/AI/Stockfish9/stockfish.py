@@ -1,7 +1,8 @@
 from Modele.Game.machine import Machine
 from Modele.Elements.memoire import Memoire
-import Modele
+from Modele.Elements.pion import Pion
 from Modele.AI.ucip import UCIP
+from Modele.Game.enums import *
 
 
 class Stockfish(Machine):
@@ -9,9 +10,10 @@ class Stockfish(Machine):
         self.stockfish = UCIP(command=['Modele/AI/Stockfish9/stockfish9Engine'], depth=depth)
         super().__init__(couleur)
 
-    def play(self, board, tous_moves):
-        self.stockfish.set_position(self.get_liste_moves(tous_moves))
+    def play(self, board, memoire):
+        self.stockfish.set_position(self.get_liste_moves(memoire.tous_move))
         best_move = self.stockfish.get_best_move()
+        best_move = best_move[:4]
 
         self.lastPosition = Memoire.cipher(best_move[:2])
         self.position = Memoire.cipher(best_move[-2:])
@@ -31,3 +33,5 @@ class Stockfish(Machine):
             liste_moves.append(move)
 
         return liste_moves
+
+

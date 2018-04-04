@@ -11,7 +11,7 @@ class Game:
 
 
 
-    def __init__(self, mode_de_jeu, choix_couleur, AI_1=None, depth_1=None, AI_2=None, depth_2=None):
+    def __init__(self, mode_de_jeu, choix_couleur=None, AI_1=None, depth_1=None, AI_2=None, depth_2=None):
 
         self.memoire = Memoire()
         self.board = [[None for _ in range(8)] for _ in range(8)]
@@ -51,16 +51,12 @@ class Game:
         :param depth: Profondeur d'évaluation
         :return: Un objet Machine() (Le AI)
         """
-        if type_ai is TypeAI.MINIMAX:
-            return #MiniMax(couleur,depth)
-        elif type_ai is TypeAI.ALPHA_BETA:
+        if type_ai is TypeAI.ALPHA_BETA:
             return AlphaBeta(couleur,depth)
         elif type_ai is TypeAI.NEURAL_NETWORK:
             return #NeuralNetwork(couleur)
         elif type_ai is TypeAI.STOCKFISH:
             return Stockfish(couleur, depth)
-        elif type_ai is TypeAI.ALPHA_ZERO:
-            return #AlphaZero(couleur)
         elif type_ai is TypeAI.LCZERO:
             return LCZero(couleur)
 
@@ -94,13 +90,11 @@ class Game:
     def next(self):
 
         player = self.get_active_player()
-        best_move = None
 
         if (isinstance(player, Machine)):
-            lastPosition, position = player.play(self.board, self.memoire.tous_move)
-
-            pieceTemp = self.board[position[0]][position[1]]
-            special = self.board[lastPosition[0]][lastPosition[1]].mouvementMemory(position,lastPosition,self.board)
-            self.move(position, lastPosition,self.board[position[0]][position[1]], pieceTemp, special)
+            pos_initiale, pos_finale = player.play(self.board, self.memoire)
+            pieceTemp = self.board[pos_finale[0]][pos_finale[1]]
+            special = self.board[pos_initiale[0]][pos_initiale[1]].mouvementMemory(pos_finale,pos_initiale,self.board)
+            self.move(pos_finale, pos_initiale,self.board[pos_finale[0]][pos_finale[1]], pieceTemp, special)
         else:
             print('Un humain a besoin de jouer avant la machine')

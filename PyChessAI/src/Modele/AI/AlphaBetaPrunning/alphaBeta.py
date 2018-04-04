@@ -37,8 +37,9 @@ class AlphaBeta(Machine):
         return total
 
     # play needs to call alphaBeta (since this is the AI in this case)
-    def play(self, board):
+    def play(self, board, memoire):
         self.board = copy.deepcopy(board)
+        self.memoire = memoire
         self.position = None
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
@@ -71,11 +72,11 @@ class AlphaBeta(Machine):
                             if moves[i][j]:
                                 tempManger = self.board[i][j]
                                 special = temp2.mouvementMemory([i, j], initial, self.board)  # faire le mouvement
-                                Modele.Elements.memoire.Memoire.move_made([i, j], initial, self.board[i][j], tempManger,
+                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger,
                                                                           special)  # Indiquer à la mémoire qu'un move fut fait (pour qu'on puisse par la suite undo)
                                 score = self.alphaBetaMax(alpha, beta,
                                                           depthleft - 1)  # passer à travers l'arbre de décision
-                                Modele.Elements.memoire.Memoire.undo(
+                                self.memoire.undo(
                                     self.board)  # undo le mouvement (pour que sa puisse correctement passer à travers l'arbre de décision)
 
                                 if score <= alpha:
@@ -107,10 +108,10 @@ class AlphaBeta(Machine):
                             if moves[i][j]:
                                 tempManger = self.board[i][j]
                                 special = temp2.mouvementMemory([i, j], initial, self.board)
-                                Modele.Elements.memoire.Memoire.move_made([i, j], initial, self.board[i][j], tempManger,
+                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger,
                                                                           special)
                                 score = self.alphaBetaMin(alpha, beta, depthleft - 1)
-                                Modele.Elements.memoire.Memoire.undo(self.board)
+                                self.memoire.undo(self.board)
 
                                 if depthleft == self.depth:
                                     if (self.position is not None and score > self.bestScore) or self.position is None:

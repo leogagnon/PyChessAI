@@ -53,8 +53,7 @@ class PieceM(ABC):
 
         if isinstance(board[position[0]][position[1]], Modele.Elements.pion.Pion):
             if position[1] == 7 or position[1] == 0:
-                output = Modele.Game.game.Game.get_active_player().choix_promotion(None, None)
-                board[position[0]][position[1]].promotion(output, board)
+                board[position[0]][position[1]].promotion(TypePiece.REINE,board)
                 special = MoveSpecial.PROMOTION
         elif isinstance(board[position[0]][position[1]], Modele.Elements.tour.Tour):
             if not(board[position[0]][position[1]].moved):

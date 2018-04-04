@@ -54,19 +54,17 @@ class Pion(PieceM):
         return False
 
     # si le pion atteint la rangé de la fin faire une promotion
-    def promotion(self, entree, board):
-        tempPieceM = None
+    def promotion(self, type_piece, board):
         test = self.position[:]
-        if (entree == self.choices[0]):
+        if (type_piece == self.choices[0]):
             tempPieceM = Reine(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[1]:
+        elif type_piece == self.choices[1]:
             tempPieceM = Tour(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[2]:
+        elif type_piece == self.choices[2]:
             tempPieceM = Fou(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[3]:
+        elif type_piece == self.choices[3]:
             tempPieceM = Chevalier(test, board[test[0]][test[1]].couleurBlanc)
         board[self.position[0]][self.position[1]] = tempPieceM
-        return tempPieceM
 
     # pouvoir connaître les choix de promotion possibles
     @staticmethod
