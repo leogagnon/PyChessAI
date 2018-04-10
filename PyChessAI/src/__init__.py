@@ -15,7 +15,6 @@ from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Game.humain import Humain
 from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
-import easygui
 import sys
 import easygui_qt
 
@@ -49,8 +48,9 @@ class Chess():
         """
         self.echiquier.blit(self.screen)
         self.init_pieces()
-        self.undo_button.blit(self.screen)
-        self.list_button.blit(self.screen)
+        if self.game.mode_de_jeu is not ModeDeJeu.MACHINE_MACHINE:
+            self.undo_button.blit(self.screen)
+            self.list_button.blit(self.screen)
 
         pygame.display.flip()
 
@@ -113,8 +113,23 @@ class Chess():
             done = self.check_mat()
             pygame.display.flip()
 
-        while (True):
-            pass
+        restart = self.demandeQuitter()
+        if restart:
+            chess_init = Chess()
+            chess_init.intro_loop()
+            chess_init.game_loop()
+
+    def demandeQuitter(self):
+        options = ["Recommencer", "Quitter"]
+        msg = "Voulez-vous recommencer? "
+        titre = "Fin"
+        choix = easygui_qt.get_choice(msg, titre, options)
+
+        if choix == options[0]:
+            return True
+        elif choix == options[1]:
+            return False
+
 
     def check_mat(self):
         posRoi = PieceM.trouverRoi(self.game.board, self.game.tour_blanc)
@@ -316,8 +331,9 @@ class Chess():
         """
         self.screen.fill((0, 0, 0))
         self.echiquier.blit(self.screen)
-        self.undo_button.blit(self.screen)
-        self.list_button.blit(self.screen)
+        if self.game.mode_de_jeu is not ModeDeJeu.MACHINE_MACHINE:
+            self.undo_button.blit(self.screen)
+            self.list_button.blit(self.screen)
 
         for i in self.liste_piece:
             for j in i:
