@@ -6,6 +6,7 @@ from Modele.Elements.roi import Roi
 from Modele.Elements.reine import Reine
 from Modele.Elements.chevalier import Chevalier
 from Modele.Elements.fou import Fou
+from Modele.Elements.pion import Pion
 from Vue.piece import Piece
 from Vue.vert import Vert
 import Modele
@@ -15,6 +16,7 @@ from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Game.humain import Humain
 from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
+import easygui
 import sys
 import easygui_qt
 
@@ -74,6 +76,7 @@ class Chess():
 
                         if pieceTemp is not None and (self.game.tour_blanc == pieceTemp.estBlanc or pieceTemp.estVert):
                             self.clicked(pieceTemp)
+                            done = self.check_mat()
                         vert = None
                         for temp in self.liste_vert:
                             if temp.image.get_rect().move(temp.position[0], temp.position[1]).collidepoint(
@@ -82,6 +85,7 @@ class Chess():
 
                         if vert is not None:
                             self.clickedVert(vert)
+                            done = self.check_mat()
                             self.boardToInterface()
                             # si on clique sur le boutton undo (commentaire pour le if suivant)
                         elif self.game.memoire.numero_move != 0 and self.undo_button.image.get_rect().move(
@@ -107,10 +111,11 @@ class Chess():
 
 
             else:
+                pygame.time.wait(1000)
                 self.game.next()
+                done = self.check_mat()
                 self.boardToInterface()
 
-            done = self.check_mat()
             pygame.display.flip()
 
         restart = self.demandeQuitter()
@@ -149,9 +154,6 @@ class Chess():
         """
         Fonctionnement logique de la conclusion
         """
-
-    def init_timer(self, pos):
-        pass
 
     def intro_loop(self):
         """
@@ -320,7 +322,7 @@ class Chess():
                     elif isinstance(self.game.board[i][j], Chevalier):
                         self.liste_piece[i][j] = Piece("cavalier", self.game.board[i][j].couleurBlanc,
                                                        self.game.board[i][j].position)
-                    elif isinstance(self.game.board[i][j], Modele.Game.machine.Pion):
+                    elif isinstance(self.game.board[i][j], Pion):
                         self.liste_piece[i][j] = Piece("pion", self.game.board[i][j].couleurBlanc,
                                                        self.game.board[i][j].position)
         self.nouveau()
@@ -370,8 +372,8 @@ class Chess():
                 self.game.board[i][7], self.game.board[colum_reflechi][7] = Reine([i, 7], False), Roi(
                     [colum_reflechi, 7], False)
         for i in range(8):
-            self.game.board[i][1] = Modele.Game.machine.Pion([i, 1], True)
-            self.game.board[i][6] = Modele.Game.machine.Pion([i, 6], False)
+            self.game.board[i][1] = Modele.Elements.pion.Pion([i, 1], True)
+            self.game.board[i][6] = Modele.Elements.pion.Pion([i, 6], False)
 
         ordre = [TypePiece.TOUR,
                  TypePiece.CAVALIER,

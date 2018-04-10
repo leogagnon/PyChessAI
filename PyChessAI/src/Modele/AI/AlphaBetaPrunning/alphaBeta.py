@@ -9,11 +9,11 @@ from Modele.Game.enums import *
 # C'est le plus simple et c'est l'implémentation d'un algorithme assez connu (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
 
 class AlphaBeta(Machine):
-    def __init__(self, couleur, depth,memoire):
+    def __init__(self, couleur, depth, game):
         self.board = None
         self.bestScore = -300
         self.depth = depth
-        super().__init__(couleur,memoire)
+        super().__init__(couleur,game)
         self.promotion = TypePiece.REINE
 
     # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
@@ -38,8 +38,8 @@ class AlphaBeta(Machine):
         return total
 
     # play needs to call alphaBeta (since this is the AI in this case)
-    def play(self, board):
-        self.board = copy.deepcopy(board)
+    def play(self):
+        self.board = copy.deepcopy(self.game.board)
         self.position = None
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
@@ -70,15 +70,13 @@ class AlphaBeta(Machine):
                     for i in range(len(moves)):
                         for j in range(len(moves[i])):
                             if moves[i][j]:
-                                tempManger = self.board[i][j]
 
                                 #Faire le mouvement
-                                special = temp2.mouvementMemory([i, j], initial, self.board)
-                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger, special)
+                                self.game.move([i, j], initial)
                                 #Evaluer
                                 score = self.alphaBetaMax(alpha, beta, depthleft - 1)
                                 #Undo
-                                self.memoire.undo(self.board)
+                                self.game.memoire.undo(self.board)
 
                                 if score <= alpha:
                                     return alpha
@@ -107,10 +105,7 @@ class AlphaBeta(Machine):
                     for i in range(len(moves)):
                         for j in range(len(moves[i])):
                             if moves[i][j]:
-                                tempManger = self.board[i][j]
-                                special = temp2.mouvementMemory([i, j], initial, self.board)
-                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger,
-                                                                          special)
+                                self.game.move([i, j], initial)
                                 score = self.alphaBetaMin(alpha, beta, depthleft - 1)
                                 self.memoire.undo(self.board)
 

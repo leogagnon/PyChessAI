@@ -6,12 +6,12 @@ from Modele.Game.enums import *
 
 
 class Stockfish(Machine):
-    def __init__(self, couleur, depth, memoire):
+    def __init__(self, couleur, depth, game):
         self.stockfish = UCIP(command=['Modele/AI/Stockfish9/stockfish9Engine'], depth=depth)
-        super().__init__(couleur, memoire)
+        super().__init__(couleur, game)
 
-    def play(self, board):
-        self.stockfish.set_position(self.get_liste_moves(self.memoire.tous_move))
+    def play(self):
+        self.stockfish.set_position(self.get_liste_moves(self.game.memoire.tous_move))
         best_move = self.stockfish.get_best_move()
         best_move = self.check_promotion(best_move)
         self.lastPosition = Memoire.cipher(best_move[:2])

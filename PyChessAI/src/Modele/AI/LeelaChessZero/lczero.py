@@ -5,13 +5,13 @@ from Modele.AI.ucip import UCIP
 
 
 class LCZero(Machine):
-    def __init__(self, couleur, memoire):
+    def __init__(self, couleur, game):
         self.lczero = UCIP(command=['Modele/AI/LeelaChessZero/lczeroEngine','-w','Modele/AI/LeelaChessZero/weights.txt'])
         self.promotion = None
-        super().__init__(couleur, memoire)
+        super().__init__(couleur, game)
 
-    def play(self, board):
-            self.lczero.set_position(self.get_liste_moves(self.memoire.tous_move))
+    def play(self):
+            self.lczero.set_position(self.get_liste_moves(self.game.memoire.tous_move))
             best_move = self.lczero.get_best_move()
             best_move = self.check_promotion(best_move)
             self.lastPosition = Memoire.cipher(best_move[:2])

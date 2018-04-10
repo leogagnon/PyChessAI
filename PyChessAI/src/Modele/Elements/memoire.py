@@ -76,7 +76,7 @@ class Memoire:
     def undo_transform(self, string_move):
         #Ignorer les promotions : P:e7-e8(:Q)
         split = string_move.split(":")
-        piece_string, move = split[-2:]
+        piece_string, move = split[:2]
         lastPosition_string, position_string = move.split("-")
 
         lastPosition, position = self.cipher(lastPosition_string), self.cipher(position_string)
