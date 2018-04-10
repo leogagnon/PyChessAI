@@ -57,13 +57,13 @@ class Game:
         :return: Un objet Machine() (Le AI)
         """
         if type_ai is TypeAI.ALPHA_BETA:
-            return AlphaBeta(couleur, depth, self.memoire)
+            return AlphaBeta(couleur, depth, self)
         elif type_ai is TypeAI.NEURAL_NETWORK:
             return  # NeuralNetwork(couleur)
         elif type_ai is TypeAI.STOCKFISH:
-            return Stockfish(couleur, depth, self.memoire)
+            return Stockfish(couleur, depth, self)
         elif type_ai is TypeAI.LCZERO:
-            return LCZero(couleur, self.memoire)
+            return LCZero(couleur, self)
 
     def get_active_player(self):
         """
@@ -107,7 +107,7 @@ class Game:
         player = self.get_active_player()
 
         if isinstance(player, Machine):
-            pos_initiale, pos_finale = player.play(self.board)
+            pos_initiale, pos_finale = player.play()
             self.move(pos_finale, pos_initiale)
         else:
             print('Un humain a besoin de jouer avant la machine !')

@@ -1,5 +1,4 @@
 from Modele.Game.joueur import Joueur
-from Modele.Elements.pion import Pion
 from abc import ABC, abstractclassmethod
 from enum import Enum
 import Modele
@@ -15,16 +14,16 @@ class TypeAI(Enum):
 # Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)
 class Machine(Joueur, ABC):
     # constructeur
-    def __init__(self, couleur, memoire):
+    def __init__(self, couleur, game):
         self.promotion = None
         self.position = None
         self.lastPosition = None
-        self.memoire = memoire
+        self.game = game
         super().__init__(couleur)
 
     # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du AI sélectionner par l'usager
     @abstractclassmethod
-    def play(self, board, memoire):
+    def play(self):
         pass
 
     def get_promotion(self):
