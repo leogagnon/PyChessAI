@@ -11,13 +11,13 @@ from Vue.vert import Vert
 import Modele
 from Modele.Game.machine import TypeAI
 from Modele.Game.game import Game
-from Modele.Elements.memoire import Memoire
 from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Game.humain import Humain
 from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
 import easygui
 import sys
+import easygui_qt
 
 
 class Chess():
@@ -26,36 +26,27 @@ class Chess():
         """
         Constructeur : Initialisations des différents éléments nécéssaires au jeu
         """
-        # Déclaration des différents images
+        # Déclaration des différentes images
         self.echiquier = Image('echiquier', [0, 0])
         self.undo_button = Bouton('undo', [self.echiquier.dimension[0] + 25, 125 + 40 * 5])
         self.list_button = Bouton('list-moves', [self.echiquier.dimension[1] + 25, 125 + 40 * 4])
 
         # Déclaration des tableaux
-        self.board = [[None for _ in range(8)] for _ in range(8)]
         self.liste_piece = [[None for _ in range(8)] for _ in range(8)]
         self.liste_vert = []
         self.position_curseur = []
         self.lastPosition = [0, 0]
 
-        # Indique le mode de jeu choisi (par défaut JOUEUR_JOUEUR)
-        self.mode_de_jeu = ModeDeJeu.JOUEUR_JOUEUR
-
-
-
+        # La partie
+        self.game = None
 
         # Initialisation de la fenetre de PyGame
         self.init_pygame()
-
-    def main(self):
-        pass
 
     def game_loop(self):
         """
         Fonctionnement logique de la partie
         """
-        Game(self.mode_de_jeu, True, AI_1=TypeAI.LCZERO, depth_1=None, AI_2=TypeAI.ALPHA_BETA, depth_2=2)
-
         self.echiquier.blit(self.screen)
         self.init_pieces()
         self.undo_button.blit(self.screen)
@@ -68,7 +59,7 @@ class Chess():
 
         # Boucle principale
         while not done:
-            if isinstance(Game.get_active_player(), Humain):
+            if isinstance(self.game.get_active_player(), Humain):
                 for event in pygame.event.get():
                     pieceTemp = None
                     if event.type == pygame.QUIT:
@@ -81,7 +72,7 @@ class Chess():
                                         self.position_curseur):
                                     pieceTemp = j
 
-                        if pieceTemp is not None and (Game.tour_blanc == pieceTemp.estBlanc or pieceTemp.estVert):
+                        if pieceTemp is not None and (self.game.tour_blanc == pieceTemp.estBlanc or pieceTemp.estVert):
                             self.clicked(pieceTemp)
                         vert = None
                         for temp in self.liste_vert:
@@ -91,15 +82,16 @@ class Chess():
 
                         if vert is not None:
                             self.clickedVert(vert)
+                            self.boardToInterface()
                             # si on clique sur le boutton undo (commentaire pour le if suivant)
-                        elif Memoire.numero_move != 0 and self.undo_button.image.get_rect().move(
+                        elif self.game.memoire.numero_move != 0 and self.undo_button.image.get_rect().move(
                                 self.undo_button.position[0], self.undo_button.position[1]).collidepoint(
                             self.position_curseur):
-                            if self.mode_de_jeu == ModeDeJeu.JOUEUR_JOUEUR:
-                                Memoire.undo(self.board)
+                            if self.game.mode_de_jeu == ModeDeJeu.JOUEUR_JOUEUR:
+                                self.game.undo()
                             else:
-                                Memoire.undo(self.board)
-                                Memoire.undo(self.board)
+                                self.game.undo()
+                                self.game.undo()
                             self.boardToInterface()
                         elif self.list_button.image.get_rect().move(self.list_button.position[0],
                                                                     self.list_button.position[1]).collidepoint(
@@ -107,15 +99,15 @@ class Chess():
 
                             liste_moves = ''
 
-                            for i in Memoire.tous_move:
+                            for i in self.game.memoire.tous_move:
                                 liste_moves += i + '\n'
 
-                            easygui.textbox('Liste des moves', 'Liste', liste_moves)
+                            easygui_qt.show_message(liste_moves,'Liste des moves')
 
 
 
             else:
-                Game.get_active_player().play(self.board)
+                self.game.next()
                 self.boardToInterface()
 
             done = self.check_mat()
@@ -125,8 +117,8 @@ class Chess():
             pass
 
     def check_mat(self):
-        posRoi = PieceM.trouverRoi(self.board, Game.tour_blanc)
-        if self.board[posRoi[0]][posRoi[1]].mat(self.board):
+        posRoi = PieceM.trouverRoi(self.game.board, self.game.tour_blanc)
+        if self.game.board[posRoi[0]][posRoi[1]].mat(self.game.board):
             return True
         return False
 
@@ -169,7 +161,7 @@ class Chess():
         pygame.display.flip()
 
         # Boucle principale
-        while choix is None:
+        while self.game is None:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(0)
@@ -178,16 +170,78 @@ class Chess():
 
                     if HH_button.image.get_rect().move(HH_button.position[0], HH_button.position[1]).collidepoint(
                             self.position_curseur):
-                        choix = ModeDeJeu.JOUEUR_JOUEUR
+                        self.init_game(ModeDeJeu.JOUEUR_JOUEUR)
                     elif HM_button.image.get_rect().move(HM_button.position[0], HM_button.position[1]).collidepoint(
                             self.position_curseur):
-                        choix = ModeDeJeu.JOUEUR_MACHINE
+                        self.init_game(ModeDeJeu.JOUEUR_MACHINE)
                     elif MM_button.image.get_rect().move(MM_button.position[0], MM_button.position[1]).collidepoint(
                             self.position_curseur):
-                        choix = ModeDeJeu.MACHINE_MACHINE
+                        self.init_game(ModeDeJeu.MACHINE_MACHINE)
 
-        self.mode_de_jeu = choix
         self.screen.fill((0, 0, 0))
+
+    def init_game(self, mode_de_jeu):
+
+        """
+        Dialogue permettant d'initialiser la partie
+        :param mode_de_jeu: Mode de jeu choisi
+        """
+        if mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
+
+            self.game = Game(ModeDeJeu.JOUEUR_JOUEUR)
+
+        elif mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
+            ai = self.choix_AI('Engine : ')
+            depth = self.choix_depth(ai)
+            blanc = self.choix_couleur()
+
+            self.game = Game(ModeDeJeu.JOUEUR_MACHINE, choix_couleur=blanc, AI_1=ai, depth_1=depth)
+        elif mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
+            ai_1 = self.choix_AI('Engine 1 (Blancs): ')
+            depth_1 = self.choix_depth(ai_1)
+            ai_2 = self.choix_AI('Engine 2 (Noirs): ')
+            depth_2 = self.choix_depth(ai_2)
+
+            self.game = Game(ModeDeJeu.MACHINE_MACHINE, AI_1=ai_1, depth_1=depth_1, AI_2=ai_2, depth_2=depth_2)
+
+    def choix_couleur(self):
+
+        """
+        Demande à l'utilisateur s'il veux commencer
+        :return: True si il veux commencer, False si il ne veux pas commencer et None pour Cancel
+        """
+        return easygui_qt.get_yes_or_no(message='Voulez-vous commencer? (Blancs)', title='Choix de couleur')
+
+    def choix_AI(self, message):
+        """
+        Demande à l'utilisateur de choisir un engine
+        :param message: Message envoyé à l'utilisateur
+        :return: Enum ModeDeJeu correspondant au type d'engine choisi
+        """
+        choix = []
+        for i in TypeAI:
+            choix.append(i.value)
+
+        reponse = easygui_qt.get_choice(message, choices=choix)
+
+        for i in TypeAI:
+            if reponse == i.value:
+                return i
+
+    def choix_depth(self, ai):
+        """
+        Demande à l'utilisateur de choisir la profondeur d'évaluation
+        :param ai: Engine utilisée
+        :return:
+        """
+        depth = None
+        if ai is TypeAI.ALPHA_BETA:
+            depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=2, min_=1,
+                                       max_=5)
+        elif ai is TypeAI.STOCKFISH:
+            depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=10, min_=1,
+                                       max_=20)
+        return depth
 
     def clickedVert(self, vert):
         """
@@ -195,10 +249,7 @@ class Chess():
         :param vert: Objet Vert sur lequel le joueur clique
         """
         coordonnees = vert.coordonnees[:]
-        special = self.board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(coordonnees, self.lastPosition,
-                                                                                         self.board)
-        self.mouvementInterface(coordonnees, self.lastPosition, special)
-        Memoire.move_made(coordonnees, self.lastPosition, self.board[coordonnees[0]][coordonnees[1]], None, special)
+        self.game.move(coordonnees, self.lastPosition)
 
     def clicked(self, piece):
         """
@@ -207,18 +258,13 @@ class Chess():
         """
         coordonnees = piece.coordonnees[:]
         if piece.estVert:
-            pieceTemp = self.board[coordonnees[0]][coordonnees[1]]
-            special = self.board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(coordonnees,
-                                                                                             self.lastPosition,
-                                                                                             self.board)
-            self.mouvementInterface(coordonnees, self.lastPosition, special)
-            Memoire.move_made(coordonnees, self.lastPosition, self.board[coordonnees[0]][coordonnees[1]], pieceTemp,
-                              special)
+            self.game.move(coordonnees, self.lastPosition)
+            self.boardToInterface()
         else:
             self.nouveau()
-            moves = self.board[coordonnees[0]][coordonnees[1]].possibiliteBouger(self.board)
-            posRoi = PieceM.trouverRoi(self.board, self.board[coordonnees[0]][coordonnees[1]].couleurBlanc)
-            self.board[posRoi[0]][posRoi[1]].acceptableMove(moves, self.board, coordonnees)
+            moves = self.game.board[coordonnees[0]][coordonnees[1]].possibiliteBouger(self.game.board)
+            posRoi = PieceM.trouverRoi(self.game.board, self.game.board[coordonnees[0]][coordonnees[1]].couleurBlanc)
+            self.game.board[posRoi[0]][posRoi[1]].acceptableMove(moves, self.game.board, coordonnees)
 
             for i in range(len(moves)):
                 for j in range(len(moves[i])):
@@ -241,23 +287,27 @@ class Chess():
         """
         self.liste_piece = [[None for i in range(8)] for j in range(8)]
 
-        for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                if self.board[i][j] is not None:
-                    if isinstance(self.board[i][j], Roi):
-                        self.liste_piece[i][j] = Piece("roi", self.board[i][j].couleurBlanc, self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Reine):
-                        self.liste_piece[i][j] = Piece("reine", self.board[i][j].couleurBlanc,
-                                                       self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Tour):
-                        self.liste_piece[i][j] = Piece("tour", self.board[i][j].couleurBlanc, self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Fou):
-                        self.liste_piece[i][j] = Piece("fou", self.board[i][j].couleurBlanc, self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Chevalier):
-                        self.liste_piece[i][j] = Piece("cavalier", self.board[i][j].couleurBlanc,
-                                                       self.board[i][j].position)
-                    elif isinstance(self.board[i][j], Modele.Game.machine.Pion):
-                        self.liste_piece[i][j] = Piece("pion", self.board[i][j].couleurBlanc, self.board[i][j].position)
+        for i in range(len(self.game.board)):
+            for j in range(len(self.game.board[i])):
+                if self.game.board[i][j] is not None:
+                    if isinstance(self.game.board[i][j], Roi):
+                        self.liste_piece[i][j] = Piece("roi", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
+                    elif isinstance(self.game.board[i][j], Reine):
+                        self.liste_piece[i][j] = Piece("reine", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
+                    elif isinstance(self.game.board[i][j], Tour):
+                        self.liste_piece[i][j] = Piece("tour", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
+                    elif isinstance(self.game.board[i][j], Fou):
+                        self.liste_piece[i][j] = Piece("fou", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
+                    elif isinstance(self.game.board[i][j], Chevalier):
+                        self.liste_piece[i][j] = Piece("cavalier", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
+                    elif isinstance(self.game.board[i][j], Modele.Game.machine.Pion):
+                        self.liste_piece[i][j] = Piece("pion", self.game.board[i][j].couleurBlanc,
+                                                       self.game.board[i][j].position)
         self.nouveau()
 
     def nouveau(self):
@@ -284,22 +334,28 @@ class Chess():
         for i in range(4):
             colum_reflechi = 7 - i
             if i == 0:
-                self.board[i][0], self.board[colum_reflechi][0] = Tour([i, 0], True), Tour([colum_reflechi, 0], True)
-                self.board[i][7], self.board[colum_reflechi][7] = Tour([i, 7], False), Tour([colum_reflechi, 7], False)
-            elif i == 1:
-                self.board[i][0], self.board[colum_reflechi][0] = Chevalier([i, 0], True), Chevalier(
+                self.game.board[i][0], self.game.board[colum_reflechi][0] = Tour([i, 0], True), Tour(
                     [colum_reflechi, 0], True)
-                self.board[i][7], self.board[colum_reflechi][7] = Chevalier([i, 7], False), Chevalier(
+                self.game.board[i][7], self.game.board[colum_reflechi][7] = Tour([i, 7], False), Tour(
+                    [colum_reflechi, 7], False)
+            elif i == 1:
+                self.game.board[i][0], self.game.board[colum_reflechi][0] = Chevalier([i, 0], True), Chevalier(
+                    [colum_reflechi, 0], True)
+                self.game.board[i][7], self.game.board[colum_reflechi][7] = Chevalier([i, 7], False), Chevalier(
                     [colum_reflechi, 7], False)
             elif i == 2:
-                self.board[i][0], self.board[colum_reflechi][0] = Fou([i, 0], True), Fou([colum_reflechi, 0], True)
-                self.board[i][7], self.board[colum_reflechi][7] = Fou([i, 7], False), Fou([colum_reflechi, 7], False)
+                self.game.board[i][0], self.game.board[colum_reflechi][0] = Fou([i, 0], True), Fou([colum_reflechi, 0],
+                                                                                                   True)
+                self.game.board[i][7], self.game.board[colum_reflechi][7] = Fou([i, 7], False), Fou([colum_reflechi, 7],
+                                                                                                    False)
             elif i == 3:
-                self.board[i][0], self.board[colum_reflechi][0] = Reine([i, 0], True), Roi([colum_reflechi, 0], True)
-                self.board[i][7], self.board[colum_reflechi][7] = Reine([i, 7], False), Roi([colum_reflechi, 7], False)
+                self.game.board[i][0], self.game.board[colum_reflechi][0] = Reine([i, 0], True), Roi(
+                    [colum_reflechi, 0], True)
+                self.game.board[i][7], self.game.board[colum_reflechi][7] = Reine([i, 7], False), Roi(
+                    [colum_reflechi, 7], False)
         for i in range(8):
-            self.board[i][1] = Modele.Game.machine.Pion([i, 1], True)
-            self.board[i][6] = Modele.Game.machine.Pion([i, 6], False)
+            self.game.board[i][1] = Modele.Game.machine.Pion([i, 1], True)
+            self.game.board[i][6] = Modele.Game.machine.Pion([i, 6], False)
 
         ordre = [TypePiece.TOUR,
                  TypePiece.CAVALIER,
@@ -336,13 +392,13 @@ class Chess():
         elif move_special == MoveSpecial.PROMOTION:
             inputs = ""
 
-            if isinstance(self.board[position[0]][position[1]], Reine):
+            if isinstance(self.game.board[position[0]][position[1]], Reine):
                 inputs = Modele.Game.machine.Pion.getChoices()[0]
-            elif isinstance(self.board[position[0]][position[1]], Tour):
+            elif isinstance(self.game.board[position[0]][position[1]], Tour):
                 inputs = Modele.Game.machine.Pion.getChoices()[1]
-            elif isinstance(self.board[position[0]][position[1]], Fou):
+            elif isinstance(self.game.board[position[0]][position[1]], Fou):
                 inputs = Modele.Game.machine.Pion.getChoices()[2]
-            elif isinstance(self.board[position[0]][position[1]], Chevalier):
+            elif isinstance(self.game.board[position[0]][position[1]], Chevalier):
                 inputs = Modele.Game.machine.Pion.getChoices()[3]
             tempPiece = Piece(inputs.name, self.liste_piece[position[0]][position[1]].estBlanc, position)
             self.liste_piece[position[0]][position[1]] = tempPiece
@@ -357,6 +413,7 @@ class Chess():
                 self.liste_piece[0][position[1]] = None
 
         self.boardToInterface()
+
 
 
 chess_init = Chess()

@@ -1,19 +1,20 @@
-from Modele.Game.machine import \
-    Machine  # le Machine est utile vu que Alpha Beta est un Machine et que je veux que celui-ci puisse avoir les caractéristiques minimales pour faire un mouvement
+from Modele.Game.machine import Machine
 import Modele
 from Modele.Elements.pieceM import PieceM
-import copy  # pour pouvoir copier adéquatement la matrice board
+import copy
+from Modele.Game.enums import *
 
 
 # Voici le premier AI que nous avons fait
 # C'est le plus simple et c'est l'implémentation d'un algorithme assez connu (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
 
 class AlphaBeta(Machine):
-    def __init__(self, couleur, depth):
+    def __init__(self, couleur, depth,memoire):
         self.board = None
         self.bestScore = -300
         self.depth = depth
-        super().__init__(couleur)
+        super().__init__(couleur,memoire)
+        self.promotion = TypePiece.REINE
 
     # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
     def evaluate(self, board):  # negatif if opponent is winning and positif if you are winning
@@ -43,13 +44,7 @@ class AlphaBeta(Machine):
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
 
-        pieceTemp = board[self.position[0]][self.position[1]]
-        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition,
-                                                                                    board)
-        Modele.Elements.memoire.Memoire.move_made(self.position, self.lastPosition,
-                                                  board[self.position[0]][self.position[1]], pieceTemp, special)
-
-        return special
+        return (self.lastPosition,self.position)
 
     # Pour comprendre cela, il faut comprendre comment alphaBeta fonctionne, mais si vous vous êtes documenté c'est l'équivalent de ce l'adversaire pourrait jouer
 
@@ -76,13 +71,14 @@ class AlphaBeta(Machine):
                         for j in range(len(moves[i])):
                             if moves[i][j]:
                                 tempManger = self.board[i][j]
-                                special = temp2.mouvementMemory([i, j], initial, self.board)  # faire le mouvement
-                                Modele.Elements.memoire.Memoire.move_made([i, j], initial, self.board[i][j], tempManger,
-                                                                          special)  # Indiquer à la mémoire qu'un move fut fait (pour qu'on puisse par la suite undo)
-                                score = self.alphaBetaMax(alpha, beta,
-                                                          depthleft - 1)  # passer à travers l'arbre de décision
-                                Modele.Elements.memoire.Memoire.undo(
-                                    self.board)  # undo le mouvement (pour que sa puisse correctement passer à travers l'arbre de décision)
+
+                                #Faire le mouvement
+                                special = temp2.mouvementMemory([i, j], initial, self.board)
+                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger, special)
+                                #Evaluer
+                                score = self.alphaBetaMax(alpha, beta, depthleft - 1)
+                                #Undo
+                                self.memoire.undo(self.board)
 
                                 if score <= alpha:
                                     return alpha
@@ -113,10 +109,10 @@ class AlphaBeta(Machine):
                             if moves[i][j]:
                                 tempManger = self.board[i][j]
                                 special = temp2.mouvementMemory([i, j], initial, self.board)
-                                Modele.Elements.memoire.Memoire.move_made([i, j], initial, self.board[i][j], tempManger,
+                                self.memoire.move_made([i, j], initial, self.board[i][j], tempManger,
                                                                           special)
                                 score = self.alphaBetaMin(alpha, beta, depthleft - 1)
-                                Modele.Elements.memoire.Memoire.undo(self.board)
+                                self.memoire.undo(self.board)
 
                                 if depthleft == self.depth:
                                     if (self.position is not None and score > self.bestScore) or self.position is None:

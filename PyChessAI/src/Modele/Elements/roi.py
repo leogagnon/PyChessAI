@@ -40,7 +40,6 @@ class Roi(PieceM):
     # Va être essentiel pour la méthode echec dans la classe Roi
     def opponentMoves(self, board):
         moves = [[False for _ in range(8)] for _ in range(8)]
-        adder = [[False for _ in range(8)] for _ in range(8)]
 
         for temp in board:
             for temp2 in temp:
