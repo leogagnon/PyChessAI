@@ -4,11 +4,15 @@ from enum import Enum
 import Modele
 
 
-class TypeAI(Enum):
+class TypeEngine(Enum):
     ALPHA_BETA = 'MiniMax avec étalonage alpha-bêta'
     NEURAL_NETWORK = 'Neural Network'
     STOCKFISH = 'Stockfish9'
     LCZERO = 'Leela Chess Zero'
+    MINIMAX = 'MiniMax classique'
+    KOMODO = 'Komodo'
+    GULL = 'Gull'
+    FIRE = 'Fire'
 
 
 # Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)

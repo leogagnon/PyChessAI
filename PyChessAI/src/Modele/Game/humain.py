@@ -9,11 +9,11 @@ class Humain(Joueur):
     def __init__(self, couleurBlanc):
         super().__init__(couleurBlanc)
 
-    # demander à l'utilisateur qu'elle pièce prendre la place du pion qui est en train d'avoir une promotion
+    # demander à l'utilisateur qu'elle pièce prendre la place du pion qui est en train d'avoir une _promotion
     def  get_promotion(self):
 
         options = ['Reine', 'Tour', 'Fou', 'Cavalier']
-        msg = 'Choisissez la promotion'
+        msg = 'Choisissez la _promotion'
         titre = 'Promotion'
         choix = easygui_qt.get_choice(msg, titre, options)
 

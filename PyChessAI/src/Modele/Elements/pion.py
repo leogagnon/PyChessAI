@@ -50,7 +50,7 @@ class Pion(PieceM):
 
 
 
-    # pouvoir connaître les choix de promotion possibles
+    # pouvoir connaître les choix de _promotion possibles
     @staticmethod
     def getChoices():
         return [TypePiece.REINE, TypePiece.TOUR, TypePiece.FOU, TypePiece.CAVALIER]

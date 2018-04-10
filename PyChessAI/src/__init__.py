@@ -10,7 +10,7 @@ from Modele.Elements.pion import Pion
 from Vue.piece import Piece
 from Vue.vert import Vert
 import Modele
-from Modele.Game.machine import TypeAI
+from Modele.Game.machine import TypeEngine
 from Modele.Game.game import Game
 from Vue.bouton import Bouton
 from Vue.image import Image
@@ -111,7 +111,7 @@ class Chess():
 
 
             else:
-                pygame.time.wait(1000)
+                #pygame.time.wait(1000)
                 self.game.next()
                 done = self.check_mat()
                 self.boardToInterface()
@@ -236,12 +236,12 @@ class Chess():
         :return: Enum ModeDeJeu correspondant au type d'engine choisi
         """
         choix = []
-        for i in TypeAI:
+        for i in TypeEngine:
             choix.append(i.value)
 
         reponse = easygui_qt.get_choice(message, choices=choix)
 
-        for i in TypeAI:
+        for i in TypeEngine:
             if reponse == i.value:
                 return i
 
@@ -252,10 +252,10 @@ class Chess():
         :return:
         """
         depth = None
-        if ai is TypeAI.ALPHA_BETA:
+        if ai is TypeEngine.ALPHA_BETA:
             depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=2, min_=1,
                                        max_=5)
-        elif ai is TypeAI.STOCKFISH:
+        elif ai is TypeEngine.STOCKFISH:
             depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=10, min_=1,
                                        max_=20)
         return depth

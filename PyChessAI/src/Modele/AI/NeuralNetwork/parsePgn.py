@@ -98,7 +98,7 @@ class ParsePgn():
             if position[1] == 7 or position[1] == 0:
                 output = self.tradPiece()
                 self.promotedPiece = None
-                self.board[position[0]][position[1]].promotion(output, self.board)
+                self.board[position[0]][position[1]]._promotion(output, self.board)
         elif isinstance(self.board[position[0]][position[1]], Tour):
             if not (self.board[position[0]][position[1]].moved):
                 self.board[position[0]][position[1]].moved = True
@@ -110,11 +110,11 @@ class ParsePgn():
                     self.board[0][position[1]].mouvementMemory([position[0] + 1, position[1]], [0, position[1]], self.board)
                 self.board[position[0]][position[1]].moved = True
 
-    #faire en sorte de ouput le string de promotion
+    #faire en sorte de ouput le string de _promotion
     def tradPiece(self):
         '''
         Fait en sorte que le string devient compréhensible pour le programme char -> string
-        :return: Output le string de la promotion
+        :return: Output le string de la _promotion
         '''
         if self.promotedPiece == ChessNotation.DAME.value:
             return Pion.getChoices()[0]

@@ -2,7 +2,7 @@ from Modele.Game.humain import Humain
 from Modele.Game.machine import Machine
 from Modele.AI.AlphaBetaPrunning.alphaBeta import AlphaBeta
 from Modele.Game.enums import *
-from Modele.Game.machine import TypeAI
+from Modele.Game.machine import TypeEngine
 from Modele.AI.Stockfish9.stockfish import Stockfish
 from Modele.AI.LeelaChessZero.lczero import LCZero
 from Modele.Elements.memoire import Memoire
@@ -19,22 +19,31 @@ class Game:
 
     def __init__(self, mode_de_jeu, choix_couleur=None, AI_1=None, depth_1=None, AI_2=None, depth_2=None):
 
-        self.memoire = Memoire()
+        # Board contenant les pièces du jeu
         self.board = [[None for _ in range(8)] for _ in range(8)]
 
+        # Memoire des moves
+        self.memoire = Memoire(self.board)
+
+        # Joueurs
         self.joueur_1 = None
         self.joueur_2 = None
+
+        # Indique à qui est le tour : True -> Blanc, False -> Noirs
         self.tour_blanc = True
+
+        # Indique le mode de jeu
         self.mode_de_jeu = mode_de_jeu
+
         self.initPlayers(choix_couleur, AI_1, depth_1, AI_2, depth_2)
 
-    def initPlayers(self, choix_couleur, AI_1, depth_1, AI_2, depth_2):
+    def initPlayers(self, choix_couleur, engine_1, depth_1, engine_2, depth_2):
         '''
         Initialise les deux joueurs
         :param choix_couleur: Couleur choisise par le joueur (Seulement utile pour JOUEUR_MACHINE)
-        :param AI_1: Type du premier AI
-        :param depth_1: Profondeur d'évaluation du premier AI
-        :param AI_2: Type du deuxième AI
+        :param engine_1: Type du premier engine
+        :param depth_1: Profondeur d'évaluation du premier engine
+        :param engine_2: Type du deuxième AI
         :param depth_2: Profondeur d'évaluation du deuxième AI
         '''
         if self.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
@@ -42,27 +51,27 @@ class Game:
             self.joueur_2 = Humain(True)
         elif self.mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
             self.joueur_1 = Humain(choix_couleur)
-            self.joueur_2 = self.init_ai(AI_1, not choix_couleur, depth_1)
+            self.joueur_2 = self._init_engine(engine_1, not choix_couleur, depth_1)
         elif self.mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
-            self.joueur_1 = self.init_ai(AI_1, True, depth_1)
-            self.joueur_2 = self.init_ai(AI_2, False, depth_2)
+            self.joueur_1 = self._init_engine(engine_1, True, depth_1)
+            self.joueur_2 = self._init_engine(engine_2, False, depth_2)
 
-    def init_ai(self, type_ai, couleur, depth):
+    def _init_engine(self, type_engine, couleur, depth):
 
         """
-        Initialise un AI et le retourne
-        :param type_ai: Type
+        Initialise un engine et le retourne
+        :param type_engine: Type
         :param couleur: Couleur
         :param depth: Profondeur d'évaluation
-        :return: Un objet Machine() (Le AI)
+        :return: Un objet Machine()
         """
-        if type_ai is TypeAI.ALPHA_BETA:
+        if type_engine is TypeEngine.ALPHA_BETA:
             return AlphaBeta(couleur, depth, self)
-        elif type_ai is TypeAI.NEURAL_NETWORK:
+        elif type_engine is TypeEngine.NEURAL_NETWORK:
             return  # NeuralNetwork(couleur)
-        elif type_ai is TypeAI.STOCKFISH:
+        elif type_engine is TypeEngine.STOCKFISH:
             return Stockfish(couleur, depth, self)
-        elif type_ai is TypeAI.LCZERO:
+        elif type_engine is TypeEngine.LCZERO:
             return LCZero(couleur, self)
 
     def get_active_player(self):
@@ -97,7 +106,7 @@ class Game:
         """
         Reviens un move en arrière et change le tour
         """
-        self.memoire.undo(self.board)
+        self.memoire.undo()
         self.tour_blanc = not self.tour_blanc
 
     def next(self):
@@ -112,10 +121,10 @@ class Game:
         else:
             print('Un humain a besoin de jouer avant la machine !')
 
-    def promotion(self, position):
+    def _promotion(self, position):
 
         """
-        Effectue la promotion
+        Effectue la _promotion
         :param position: Position de la pièce à promouvoir
         """
         player = self.get_active_player()
@@ -178,7 +187,7 @@ class Game:
 
         if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
             if pos_finale[1] == 7 or pos_finale[1] == 0:
-                self.promotion(pos_finale)
+                self._promotion(pos_finale)
                 special = MoveSpecial.PROMOTION
         elif isinstance(self.board[pos_finale[0]][pos_finale[1]], Tour):
             if not (self.board[pos_finale[0]][pos_finale[1]].moved):

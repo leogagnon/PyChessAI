@@ -1,12 +1,8 @@
 from Modele.Game.machine import Machine
-import Modele
 from Modele.Elements.pieceM import PieceM
-import copy
 from Modele.Game.enums import *
 
-
-# Voici le premier AI que nous avons fait
-# C'est le plus simple et c'est l'implémentation d'un algorithme assez connu (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
+# Simple implémentation de l'algorithme alpha-bêta (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )
 
 class AlphaBeta(Machine):
     def __init__(self, couleur, depth, game):
@@ -14,10 +10,17 @@ class AlphaBeta(Machine):
         self.bestScore = -300
         self.depth = depth
         super().__init__(couleur,game)
+
+        #Promotion fixé à reine
         self.promotion = TypePiece.REINE
 
-    # C'est une évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et c'est positif si c'est le AI qui gagne)
-    def evaluate(self, board):  # negatif if opponent is winning and positif if you are winning
+    def evaluate(self, board):
+        """
+        Évaluation sommaire de l'état d'un échiquier (c'est négatif si l'adversaire du AI est en train de gagner et
+        c'est positif si c'est le AI qui gagne)
+        :param board:
+        :return:
+        """
         total = 0
         for temp1 in board:
             for temp2 in temp1:
@@ -26,20 +29,27 @@ class AlphaBeta(Machine):
                     if temp2.couleurBlanc != self.COULEUR_BLANC:
                         multiplier = -1
                     total += multiplier * temp2.value
-                    total += multiplier * 0.1 * self.countAvailableMoves(temp2.possibiliteBouger(board))
+                    total += multiplier * 0.1 * self.nbr_true(temp2.possibiliteBouger(board))
         return total
 
-    # C'est utile pour savoir combien de moves sont possible de faire
-    def countAvailableMoves(self, moves):
+    def nbr_true(self, matrice):
+        """
+        Compte le nombre de True dans une matrice
+        :param matrice: Ensembles des moves possibles pour une pièce
+        :return: Nombres de coups possibles
+        """
         total = 0
-        for i in moves:
-            for j in i:
-                if j: total += 1
+        for i in matrice:
+            total += sum(i)
         return total
 
     # play needs to call alphaBeta (since this is the AI in this case)
     def play(self):
-        self.board = copy.deepcopy(self.game.board)
+        """
+        Voir méthode mère
+        :return: Le meilleur move à faire
+        """
+        self.board = self.game.board
         self.position = None
         self.lastPosition = None
         self.alphaBetaMax(-300, 300, self.depth)
@@ -76,7 +86,7 @@ class AlphaBeta(Machine):
                                 #Evaluer
                                 score = self.alphaBetaMax(alpha, beta, depthleft - 1)
                                 #Undo
-                                self.game.memoire.undo(self.board)
+                                self.game.undo()
 
                                 if score <= alpha:
                                     return alpha
@@ -107,7 +117,7 @@ class AlphaBeta(Machine):
                             if moves[i][j]:
                                 self.game.move([i, j], initial)
                                 score = self.alphaBetaMin(alpha, beta, depthleft - 1)
-                                self.memoire.undo(self.board)
+                                self.game.undo()
 
                                 if depthleft == self.depth:
                                     if (self.position is not None and score > self.bestScore) or self.position is None:
