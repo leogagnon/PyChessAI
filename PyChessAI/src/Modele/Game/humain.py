@@ -1,6 +1,7 @@
-from Modele.Game.joueur import Joueur
-from Modele.Elements.pion import Pion
 import easygui_qt
+
+from Modele.Elements.pion import Pion
+from Modele.Game.joueur import Joueur
 
 
 # Cela est l'équivalent du joueur humain qui va pouvoir jouer (cela ne sera utile que pour la classe Game)
@@ -9,11 +10,15 @@ class Humain(Joueur):
     def __init__(self, couleurBlanc):
         super().__init__(couleurBlanc)
 
-    # demander à l'utilisateur qu'elle pièce prendre la place du pion qui est en train d'avoir une _promotion
-    def  get_promotion(self):
+    # demander à l'utilisateur qu'elle pièce prendre la place du pion qui est en train d'avoir une __promotion
+    def get_promotion(self):
 
+        """
+        Demande à l'utilisateur quel promotion il désire faire
+        :return:
+        """
         options = ['Reine', 'Tour', 'Fou', 'Cavalier']
-        msg = 'Choisissez la _promotion'
+        msg = 'Choisissez la __promotion'
         titre = 'Promotion'
         choix = easygui_qt.get_choice(msg, titre, options)
 

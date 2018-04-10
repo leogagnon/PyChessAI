@@ -1,13 +1,15 @@
-from Modele.Game.machine import Machine
-from Modele.Engines.NeuralNetwork.network import Network
-from Modele.Elements.pion import Pion
+import pickle
+
+import Modele
 from Modele.Elements.chevalier import Chevalier
 from Modele.Elements.fou import Fou
-from Modele.Elements.tour import Tour
+from Modele.Elements.pion import Pion
 from Modele.Elements.reine import Reine
 from Modele.Elements.roi import Roi
-import pickle
-import Modele
+from Modele.Elements.tour import Tour
+from Modele.Engines.NeuralNetwork.network import Network
+from Modele.Game.machine import Machine
+
 
 class NeuralMachine(Machine):
     def __init__(self, couleur):
@@ -122,12 +124,12 @@ class NeuralMachine(Machine):
         self.position = None
         self.lastPosition = None
         self.remplirWeight("Modele\AI\\NeuralNetwork\weights")
-        move = self.nn.calulate(board, self.COULEUR_BLANC, Modele.Elements.memoire.Memoire.numero_move)
+        move = self.nn.calulate(board, self.COULEUR_BLANC, Modele.Game.memoire.Memoire.numero_move)
         self.lastPosition , self.position = move[0], move[1]
 
         pieceTemp = board[self.position[0]][self.position[1]]
         special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition, board)
-        Modele.Elements.memoire.Memoire.move_made(self.position, self.lastPosition, board[self.position[0]][self.position[1]], pieceTemp, special)
+        Modele.Game.memoire.Memoire.move_made(self.position, self.lastPosition, board[self.position[0]][self.position[1]], pieceTemp, special)
         return special
 
     def remplirWeight(self, path):

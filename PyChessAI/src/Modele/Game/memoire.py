@@ -2,10 +2,6 @@ import Modele
 from Modele.Game.enums import *
 
 
-# cette classe est utile pour undo (ce qui sera utile dans chaque mode_de_jeu)
-# les deux méthode qui vont être utile en dehors de la classe sont move_made et undo
-
-
 class Memoire:
     def __init__(self, game_board):
         # Board de la game
@@ -51,7 +47,7 @@ class Memoire:
                 self.board[position[0]][lastPosition[1]] = Modele.Elements.pion.Pion([position[0], lastPosition[1]],
                                                                                      not pieceBouger.couleurBlanc)
                 self.board[position[0]][lastPosition[1]].first = False
-            elif special == MoveSpecial.PROMOTION:  # _promotion
+            elif special == MoveSpecial.PROMOTION:  # __promotion
                 self.board[lastPosition[0]][lastPosition[1]] = Modele.Elements.pion.Pion(lastPosition,
                                                                                          pieceBouger.couleurBlanc)
                 self.board[lastPosition[0]][lastPosition[1]].first = False
@@ -109,7 +105,7 @@ class Memoire:
     def cipher(string_position):
         return [ord(string_position[0]) - ord('a'), int(string_position[1]) - 1]
 
-    # its meant to transform a move to a String (exemple) ->   "T:a1-b2" ou "P:e7-e8:Q" pour une _promotion
+    # its meant to transform a move to a String (exemple) ->   "T:a1-b2" ou "P:e7-e8:Q" pour une __promotion
     @staticmethod
     def transform(position, lastPosition, piece, promotion):
         if isinstance(piece, Modele.Elements.roi.Roi):

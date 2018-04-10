@@ -1,17 +1,17 @@
+from Modele.Elements.chevalier import Chevalier
+from Modele.Elements.fou import Fou
+from Modele.Elements.pion import Pion
+from Modele.Elements.reine import Reine
+from Modele.Elements.roi import Roi
+from Modele.Elements.tour import Tour
+from Modele.Engines.AlphaBetaPrunning.alphaBeta import AlphaBeta
+from Modele.Engines.LeelaChessZero.lczero import LCZero
+from Modele.Engines.Stockfish9.stockfish import Stockfish
+from Modele.Game.enums import *
 from Modele.Game.humain import Humain
 from Modele.Game.machine import Machine
-from Modele.Engines.AlphaBetaPrunning.alphaBeta import AlphaBeta
-from Modele.Game.enums import *
 from Modele.Game.machine import TypeEngine
-from Modele.Engines.Stockfish9.stockfish import Stockfish
-from Modele.Engines.LeelaChessZero.lczero import LCZero
-from Modele.Elements.memoire import Memoire
-from Modele.Elements.fou import Fou
-from Modele.Elements.reine import Reine
-from Modele.Elements.chevalier import Chevalier
-from Modele.Elements.tour import Tour
-from Modele.Elements.pion import Pion
-from Modele.Elements.roi import Roi
+from Modele.Game.memoire import Memoire
 
 
 class Game:
@@ -35,50 +35,14 @@ class Game:
         # Indique le mode de jeu
         self.mode_de_jeu = mode_de_jeu
 
-        self.initPlayers(choix_couleur, AI_1, depth_1, AI_2, depth_2)
-
-    def initPlayers(self, choix_couleur, engine_1, depth_1, engine_2, depth_2):
-        '''
-        Initialise les deux joueurs
-        :param choix_couleur: Couleur choisise par le joueur (Seulement utile pour JOUEUR_MACHINE)
-        :param engine_1: Type du premier engine
-        :param depth_1: Profondeur d'évaluation du premier engine
-        :param engine_2: Type du deuxième Engines
-        :param depth_2: Profondeur d'évaluation du deuxième Engines
-        '''
-        if self.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
-            self.joueur_1 = Humain(False)
-            self.joueur_2 = Humain(True)
-        elif self.mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
-            self.joueur_1 = Humain(choix_couleur)
-            self.joueur_2 = self._init_engine(engine_1, not choix_couleur, depth_1)
-        elif self.mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
-            self.joueur_1 = self._init_engine(engine_1, True, depth_1)
-            self.joueur_2 = self._init_engine(engine_2, False, depth_2)
-
-    def _init_engine(self, type_engine, couleur, depth):
-
-        """
-        Initialise un engine et le retourne
-        :param type_engine: Type
-        :param couleur: Couleur
-        :param depth: Profondeur d'évaluation
-        :return: Un objet Machine()
-        """
-        if type_engine is TypeEngine.ALPHA_BETA:
-            return AlphaBeta(couleur, depth, self)
-        elif type_engine is TypeEngine.NEURAL_NETWORK:
-            return  # NeuralNetwork(couleur)
-        elif type_engine is TypeEngine.STOCKFISH:
-            return Stockfish(couleur, depth, self)
-        elif type_engine is TypeEngine.LCZERO:
-            return LCZero(couleur, self)
+        self.__init_joueurs(choix_couleur, AI_1, depth_1, AI_2, depth_2)
 
     def get_active_player(self):
         """
         Indique à qui est le tour
         :return: Revoie un objet Joueur()
         """
+
         if self.joueur_1.COULEUR_BLANC is self.tour_blanc:
             return self.joueur_1
         return self.joueur_2
@@ -93,7 +57,7 @@ class Game:
 
         piece = self.board[pos_initiale[0]][pos_initiale[1]]
         manger = self.board[pos_finale[0]][pos_finale[1]]
-        special = self._make_move(pos_finale, pos_initiale)
+        special = self.__make_move(pos_finale, pos_initiale)
         promotion = None
 
         if special is MoveSpecial.PROMOTION:
@@ -106,6 +70,7 @@ class Game:
         """
         Reviens un move en arrière et change le tour
         """
+
         self.memoire.undo()
         self.tour_blanc = not self.tour_blanc
 
@@ -113,6 +78,7 @@ class Game:
         """
         Passe au prochain tour en faisant jouer une machine
         """
+
         player = self.get_active_player()
 
         if isinstance(player, Machine):
@@ -121,12 +87,12 @@ class Game:
         else:
             print('Un humain a besoin de jouer avant la machine !')
 
-    def _promotion(self, position):
-
+    def __promotion(self, position):
         """
-        Effectue la _promotion
+        Effectue la __promotion
         :param position: Position de la pièce à promouvoir
         """
+
         player = self.get_active_player()
         choix = player.get_promotion()
 
@@ -139,14 +105,14 @@ class Game:
         elif choix == TypePiece.FOU:
             self.board[position[0]][position[1]] = Fou(position, player.COULEUR_BLANC)
 
-    def _make_move(self, pos_finale, pos_initiale):
-
+    def __make_move(self, pos_finale, pos_initiale):
         """
         Effectue un move dans le board en prenant en compte les mouvements spéciaux
         :param pos_finale: Position finale de la pièce
         :param pos_initiale: Position initiale de la pièce
         :return: Type de mouvement spécial
         """
+
         # Valeur spéciale par défaut
         special = MoveSpecial.NULL
 
@@ -187,7 +153,7 @@ class Game:
 
         if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
             if pos_finale[1] == 7 or pos_finale[1] == 0:
-                self._promotion(pos_finale)
+                self.__promotion(pos_finale)
                 special = MoveSpecial.PROMOTION
         elif isinstance(self.board[pos_finale[0]][pos_finale[1]], Tour):
             if not (self.board[pos_finale[0]][pos_finale[1]].moved):
@@ -197,11 +163,49 @@ class Game:
             if not self.board[pos_finale[0]][pos_finale[1]].moved:
                 special = MoveSpecial.PREMIER_MOUVEMENT_ROI
                 if pos_initiale[0] - pos_finale[0] == -2:
-                    self._make_move([pos_finale[0] - 1, pos_finale[1]], [7, pos_finale[1]])
+                    self.__make_move([pos_finale[0] - 1, pos_finale[1]], [7, pos_finale[1]])
                     special = MoveSpecial.ROQUE
                 elif pos_initiale[0] - pos_finale[0] == 2:
-                    self._make_move([pos_finale[0] + 1, pos_finale[1]], [0, pos_finale[1]])
+                    self.__make_move([pos_finale[0] + 1, pos_finale[1]], [0, pos_finale[1]])
                     special = MoveSpecial.ROQUE
                 self.board[pos_finale[0]][pos_finale[1]].moved = True
 
         return special
+
+    def __init_joueurs(self, choix_couleur, engine_1, depth_1, engine_2, depth_2):
+        '''
+        Initialise les deux joueurs
+        :param choix_couleur: Couleur choisise par le joueur (Seulement utile pour JOUEUR_MACHINE)
+        :param engine_1: Type du premier engine
+        :param depth_1: Profondeur d'évaluation du premier engine
+        :param engine_2: Type du deuxième Engines
+        :param depth_2: Profondeur d'évaluation du deuxième Engines
+        '''
+
+        if self.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
+            self.joueur_1 = Humain(False)
+            self.joueur_2 = Humain(True)
+        elif self.mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
+            self.joueur_1 = Humain(choix_couleur)
+            self.joueur_2 = self.__init_engine(engine_1, not choix_couleur, depth_1)
+        elif self.mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
+            self.joueur_1 = self.__init_engine(engine_1, True, depth_1)
+            self.joueur_2 = self.__init_engine(engine_2, False, depth_2)
+
+    def __init_engine(self, type_engine, couleur, depth):
+        """
+        Initialise un engine et le retourne
+        :param type_engine: Type
+        :param couleur: Couleur
+        :param depth: Profondeur d'évaluation
+        :return: Un objet Machine()
+        """
+
+        if type_engine is TypeEngine.ALPHA_BETA:
+            return AlphaBeta(couleur, depth, self)
+        elif type_engine is TypeEngine.NEURAL_NETWORK:
+            return  # NeuralNetwork(couleur)
+        elif type_engine is TypeEngine.STOCKFISH:
+            return Stockfish(couleur, depth, self)
+        elif type_engine is TypeEngine.LCZERO:
+            return LCZero(couleur, self)
