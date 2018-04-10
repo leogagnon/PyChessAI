@@ -6,55 +6,30 @@ from Modele.Elements.pieceM import PieceM
 from Modele.Elements.reine import Reine
 from Modele.Elements.roi import Roi
 from Modele.Elements.tour import Tour
-from Modele.Players.enums import ChessNotation
-from Modele.Players.enums import PieceChess
+from Modele.Game.enums import ChessNotation
+import pickle
 
-
-#10009
 
 class ParsePgn():
     def __init__(self, file_name):
+        '''
+        L'utilité de cette classe sera de parser les files où il y a les données de milliers de games d'échecs pour que sa devienne lisible par notre programme string -> int[int[], int[]] pour lastPosition et position
+        Ce programme ne sera pas exécuter en même temps que le programme d'échec (c'est runner indépendemment juste pour creer le data.txt qui sera utile au programme)
+        :param file_name: c'est tout simplement le nom du fichier à parser
+        '''
         pgn_text = open(file_name + ".pgn").read()
         self.games = pgn.loads(pgn_text)
         self.board = None
         self.initPiece()
         self.tourBlanc = None
         self.promotedPiece = None
-    '''
-    def afficher(self):
-        for i in self.board:
-            message = ""
-            for j in i:
-                printer = 0
-                if j is None:
-                    message += str(PieceChess.NONE.value)
-                    printer = 1
-                else:
-                    multiplier = -1
-                    printer = 0
-                    if j.couleurBlanc:
-                        multiplier = 1
-                        printer = 1
-
-                    if isinstance(j, Pion):
-                        message += str(PieceChess.PION.value * multiplier)
-                    elif isinstance(j, Chevalier):
-                        message += str(PieceChess.CAVALIER.value * multiplier)
-                    elif isinstance(j, Fou):
-                        message += str(PieceChess.FOU.value * multiplier)
-                    elif isinstance(j, Tour):
-                        message += str(PieceChess.TOUR.value * multiplier)
-                    elif isinstance(j, Reine):
-                        message += str(PieceChess.REINE.value * multiplier)
-                    elif isinstance(j, Roi):
-                        message += str(PieceChess.ROI.value * multiplier)
-                message += " " + " "*printer
-            print(message)
-        print("\n")
-    '''
 
     #remplir le board pour que celui-ci devienne un board qui n'a pas encore été touché
     def initPiece(self):
+        '''
+        Cela va tout simplement initialiser le board à son état normal (c-a-d que le board va se trouver comme si personne avait jouer un move)
+        :return: sa ne return rien
+        '''
         self.tourBlanc = True
         self.board = [[None for _ in range(8)] for _ in range(8)]
         for i in range(4):
@@ -79,24 +54,37 @@ class ParsePgn():
 
     #create a txt file that has all the moves in this format int[int[], int[]] -> [lastPosition, position]
     def createFile(self):
+        '''
+        C'est le main loop (sa va looper à travers tout le fichier et va appeler les méthodes qui vont parser et remplir le fichier)
+        :return: sa ne retourne rien
+        '''
+        total = len(self.games)
+        print(total)
+        number = 0
         for game in self.games:
+
             self.initPiece()
             partie = game.moves[:len(game.moves)-2]
             temp = []
             for string in partie:
-                #self.afficher()
                 infos = self.parserInfo(string)
                 temp.append(infos)
                 self.mouvementMemory(infos[0], infos[1])
                 self.tourBlanc = not self.tourBlanc
-            print("done")
-            #fichier = open("data.txt", "a")
-            #fichier.write("\n" + str(temp))
-            #fichier.close()
-        print("succ")
+            with open("enter/data" + str(number) +".pkl", "wb") as f:
+                pickle.dump(temp, f)
+            number += 1
+            print("done ... " + str(number*100/total) + "%")
+
 
     # va faire le changement plus complet que testMouvementMemory dans le sens ou il va tenir en compte de savoir s'il y a un coup special
     def mouvementMemory(self, lastPosition, position):
+        '''
+        Sa va prendre une position de départ (lastPosition) et la position finale (position) et sa va modifier le board selon le move
+        :param lastPosition: la position initiale de la pièce à bouger
+        :param position: la position finale de la pièce à bouger
+        :return:
+        '''
         if isinstance(self.board[lastPosition[0]][lastPosition[1]], Pion):
             self.board[lastPosition[0]][lastPosition[1]].ongoingPassant(position, lastPosition, self.board)
 
@@ -108,7 +96,7 @@ class ParsePgn():
 
         if isinstance(self.board[position[0]][position[1]], Pion):
             if position[1] == 7 or position[1] == 0:
-                output = self.tradPiece(position)
+                output = self.tradPiece()
                 self.promotedPiece = None
                 self.board[position[0]][position[1]].promotion(output, self.board)
         elif isinstance(self.board[position[0]][position[1]], Tour):
@@ -123,19 +111,31 @@ class ParsePgn():
                 self.board[position[0]][position[1]].moved = True
 
     #faire en sorte de ouput le string de promotion
-    def tradPiece(self, position):
+    def tradPiece(self):
+        '''
+        Fait en sorte que le string devient compréhensible pour le programme char -> string
+        :return: Output le string de la promotion
+        '''
         if self.promotedPiece == ChessNotation.DAME.value:
             return Pion.getChoices()[0]
         elif self.promotedPiece == ChessNotation.TOUR.value:
             return Pion.getChoices()[1]
         elif self.promotedPiece == ChessNotation.FOU.value:
             return Pion.getChoices()[2]
-        return Pion.getChoices()[3]
+        elif self.promotedPiece == ChessNotation.CAVALIER.value:
+            return Pion.getChoices()[3]
+        else:
+            return None
 
 
     #transformer le string du mouvement avec le bard en mouvement -> basically le parser
     #va return un int[int[], int[]]
     def parserInfo(self, string):
+        '''
+        Sa c'est la méthode qui va actually prendre le string et output le int[int[], int[]]
+        :param string: c'est le move
+        :return: va return le lastPosition et le position
+        '''
         lastPosition = []
         position = []
         if string[-1] == ChessNotation.MAT.value: #mat
@@ -212,14 +212,18 @@ class ParsePgn():
                             for i in pieces:
                                 if i.position[0] == valeurNumeric:
                                     lastPosition = i.position
-        if len(lastPosition) != 2:
-            print("sndklad")
 
-        return [lastPosition, position]
+        return [lastPosition, position, self.tradPiece()]
 
 
     #cela exclut les pions (pcq on a pas besoin de les faire)
     def findPiece(self, string, position):
+        '''
+        Va trouver tous les pieces dans self.board qui correspond au string (un roi, etc)
+        :param string:
+        :param position:
+        :return:
+        '''
         piece = []
         typePiece = None
         if string == ChessNotation.ROI.value:
@@ -246,5 +250,6 @@ class ParsePgn():
         return piece
 
 
-lol = ParsePgn("setGames1")
-lol.createFile()
+temp = ParsePgn("setGames1")
+temp.createFile()
+
