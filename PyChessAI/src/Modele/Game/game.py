@@ -1,10 +1,10 @@
 from Modele.Game.humain import Humain
 from Modele.Game.machine import Machine
-from Modele.AI.AlphaBetaPrunning.alphaBeta import AlphaBeta
+from Modele.Engines.AlphaBetaPrunning.alphaBeta import AlphaBeta
 from Modele.Game.enums import *
 from Modele.Game.machine import TypeEngine
-from Modele.AI.Stockfish9.stockfish import Stockfish
-from Modele.AI.LeelaChessZero.lczero import LCZero
+from Modele.Engines.Stockfish9.stockfish import Stockfish
+from Modele.Engines.LeelaChessZero.lczero import LCZero
 from Modele.Elements.memoire import Memoire
 from Modele.Elements.fou import Fou
 from Modele.Elements.reine import Reine
@@ -43,8 +43,8 @@ class Game:
         :param choix_couleur: Couleur choisise par le joueur (Seulement utile pour JOUEUR_MACHINE)
         :param engine_1: Type du premier engine
         :param depth_1: Profondeur d'évaluation du premier engine
-        :param engine_2: Type du deuxième AI
-        :param depth_2: Profondeur d'évaluation du deuxième AI
+        :param engine_2: Type du deuxième Engines
+        :param depth_2: Profondeur d'évaluation du deuxième Engines
         '''
         if self.mode_de_jeu is ModeDeJeu.JOUEUR_JOUEUR:
             self.joueur_1 = Humain(False)

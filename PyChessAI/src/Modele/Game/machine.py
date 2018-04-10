@@ -15,7 +15,7 @@ class TypeEngine(Enum):
     FIRE = 'Fire'
 
 
-# Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)
+# Voici la classe abstraite pour tous nos Engines (vu que ceux-ci doivent partager des caractéristiques communes)
 class Machine(Joueur, ABC):
     # constructeur
     def __init__(self, couleur, game):
@@ -25,7 +25,7 @@ class Machine(Joueur, ABC):
         self.game = game
         super().__init__(couleur)
 
-    # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du AI sélectionner par l'usager
+    # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du Engines sélectionner par l'usager
     @abstractclassmethod
     def play(self):
         pass

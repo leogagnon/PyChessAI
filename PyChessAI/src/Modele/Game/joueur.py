@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod  # pour faire des classes et des méthodes a
 import Modele
 
 
-#C'est la classe qui va contenir les informations générales que le AI ou le joueur Humain doivent posséder
+#C'est la classe qui va contenir les informations générales que le Engines ou le joueur Humain doivent posséder
 class Joueur(ABC):
     # constructeur
     def __init__(self, couleur_blanc):

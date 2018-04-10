@@ -16,7 +16,6 @@ from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Game.humain import Humain
 from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
-import easygui
 import sys
 import easygui_qt
 
@@ -43,6 +42,9 @@ class Chess():
 
         # Initialisation de la fenetre de PyGame
         self.init_pygame()
+
+        # Temps avant que les engines jouent leur tours (ms)
+        self.DELAIS_ENGINE = 1000
 
     def game_loop(self):
         """
@@ -111,14 +113,15 @@ class Chess():
 
 
             else:
-                #pygame.time.wait(1000)
                 self.game.next()
                 done = self.check_mat()
+                pygame.time.wait(self.DELAIS_ENGINE)
                 self.boardToInterface()
 
             pygame.display.flip()
 
         restart = self.demandeQuitter()
+        
         if restart:
             chess_init = Chess()
             chess_init.intro_loop()
