@@ -47,26 +47,8 @@ class Pion(PieceM):
         return moves
 
     # cette méthode fait en sorte de vérifier s'il y a vraiment une prise en passant par le pion et va faire le travail que mouvementMemory ne fait pas c'est à dire faire disparaitre le pion manger
-    def ongoingPassant(self, position, lastPosition, board):
-        if abs(position[0] - lastPosition[0]) == 1 and board[position[0]][position[1]] == None:
-            board[position[0]][lastPosition[1]] = None
-            return True
-        return False
 
-    # si le pion atteint la rangé de la fin faire une promotion
-    def promotion(self, entree, board):
-        tempPieceM = None
-        test = self.position[:]
-        if (entree == self.choices[0]):
-            tempPieceM = Reine(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[1]:
-            tempPieceM = Tour(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[2]:
-            tempPieceM = Fou(test, board[test[0]][test[1]].couleurBlanc)
-        elif entree == self.choices[3]:
-            tempPieceM = Chevalier(test, board[test[0]][test[1]].couleurBlanc)
-        board[self.position[0]][self.position[1]] = tempPieceM
-        return tempPieceM
+
 
     # pouvoir connaître les choix de promotion possibles
     @staticmethod

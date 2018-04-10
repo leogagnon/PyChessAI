@@ -15,17 +15,14 @@ class Memoire:
         self.tous_move = []  # va n'être qu'un array de String qui va conserver toute les informations de quelle pièce a bouger de où à où
 
     # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo
-    def move_made(self,position, lastPosition, piece, manger, special):
-        self.normal(position, lastPosition, piece)
+    def move_made(self,position, lastPosition, piece, manger, special, promotion=None):
+        self.tous_move.append(Memoire.transform(position, lastPosition, piece, promotion))
         if special != MoveSpecial.NULL:
             self.special(special)
         if manger is not None:
             self.mange(manger)
         self.numero_move += 1
 
-    #normal means that it only saves what piece moved from where to where
-    def normal(self, position, lastPosition, piece):
-        self.tous_move.append(Memoire.transform(position, lastPosition, piece))
 
     #saves a eaten piece
     def mange(self, piece):
@@ -77,23 +74,25 @@ class Memoire:
 
     #prendre le string qui a été noté et output le move qui a été fait et avec quelle pièce
     def undo_transform(self, string_move):
-        piece_string, move = string_move.split(":")
+        #Ignorer les promotions : P:e7-e8(:Q)
+        split = string_move.split(":")
+        piece_string, move = split[-2:]
         lastPosition_string, position_string = move.split("-")
 
         lastPosition, position = self.cipher(lastPosition_string), self.cipher(position_string)
 
         pieceTemp = None
-        if piece_string == "T":
+        if piece_string == "R":
             pieceTemp = Modele.Elements.tour.Tour(lastPosition, self.numero_move%2 == 1)
             pieceTemp.moved = True
-        elif piece_string == "R":
+        elif piece_string == "K":
             pieceTemp = Modele.Elements.roi.Roi(lastPosition, self.numero_move%2 == 1)
             pieceTemp.moved = True
-        elif piece_string == "D":
+        elif piece_string == "Q":
             pieceTemp = Modele.Elements.reine.Reine(lastPosition, self.numero_move%2 == 1)
-        elif piece_string == "C":
+        elif piece_string == "N":
             pieceTemp = Modele.Elements.chevalier.Chevalier(lastPosition, self.numero_move%2 == 1)
-        elif piece_string == "F":
+        elif piece_string == "B":
             pieceTemp = Modele.Elements.fou.Fou(lastPosition, self.numero_move%2 == 1)
         elif piece_string == "P":
             pieceTemp = Modele.Elements.pion.Pion(lastPosition, self.numero_move%2 == 1)
@@ -106,24 +105,42 @@ class Memoire:
     def cipher(string_position):
         return [ord(string_position[0]) - ord('a'), int(string_position[1]) - 1]
 
-    # its meant to transform a move to a String (exemple) ->   "T:a1-b2"
+    # its meant to transform a move to a String (exemple) ->   "T:a1-b2" ou "P:e7-e8:Q" pour une promotion
     @staticmethod
-    def transform(position, lastPosition, piece):
-        letter = ' '
+    def transform(position, lastPosition, piece, promotion):
         if isinstance(piece, Modele.Elements.roi.Roi):
-            letter = 'R'
+            letter = 'K'
         elif isinstance(piece, Modele.Elements.reine.Reine):
-            letter = 'D'
+            letter = 'Q'
         elif isinstance(piece, Modele.Elements.tour.Tour):
-            letter = 'T'
+            letter = 'R'
         elif isinstance(piece, Modele.Elements.chevalier.Chevalier):
-            letter = 'C'
+            letter = 'N'
         elif isinstance(piece, Modele.Elements.fou.Fou):
-            letter = 'F'
+            letter = 'B'
         else:
             letter = 'P'
+
+        letter_promotion = None
+
+        if promotion is not None:
+            print(promotion)
+            if isinstance(promotion, Modele.Elements.roi.Roi):
+                letter_promotion = 'K'
+            elif isinstance(promotion, Modele.Elements.reine.Reine):
+                letter_promotion = 'Q'
+            elif isinstance(promotion, Modele.Elements.tour.Tour):
+                letter_promotion = 'R'
+            elif isinstance(promotion, Modele.Elements.chevalier.Chevalier):
+                letter_promotion = 'N'
+            elif isinstance(promotion, Modele.Elements.fou.Fou):
+                letter_promotion = 'B'
+            else:
+                letter_promotion = 'P'
+
+
         return letter + ":" + chr(ord('a') + lastPosition[0]) + str(lastPosition[1] + 1) + "-" + chr(
-            ord('a') + position[0]) + str(position[1] + 1)
+            ord('a') + position[0]) + str(position[1] + 1) + ('' if promotion is None else ":" + letter_promotion)
 
 
 

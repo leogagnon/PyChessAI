@@ -6,27 +6,26 @@ import Modele
 
 
 class TypeAI(Enum):
-    MINIMAX = 'Minimax'
     ALPHA_BETA = 'MiniMax avec étalonage alpha-bêta'
     NEURAL_NETWORK = 'Neural Network'
     STOCKFISH = 'Stockfish9'
-    ALPHA_ZERO = 'Alpha Zero (Google)'
     LCZERO = 'Leela Chess Zero'
 
 
 # Voici la classe abstraite pour tous nos AI (vu que ceux-ci doivent partager des caractéristiques communes)
 class Machine(Joueur, ABC):
     # constructeur
-    def __init__(self, couleur):
+    def __init__(self, couleur, memoire):
+        self.promotion = None
         self.position = None
         self.lastPosition = None
+        self.memoire = memoire
         super().__init__(couleur)
 
     # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du AI sélectionner par l'usager
     @abstractclassmethod
-    def play(self, board, tous_moves):
+    def play(self, board, memoire):
         pass
 
-    # Cela dit que le choix que le AI fait pour la promotion est une dame (dans les games sérieuses c'est 99% du temps un dame)
-    def choix_promotion(self, board, position):
-        return Pion.getChoices()[0]
+    def get_promotion(self):
+        return self.promotion

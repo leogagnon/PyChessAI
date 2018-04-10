@@ -8,12 +8,7 @@ class Joueur(ABC):
     def __init__(self, couleur_blanc):
         self.COULEUR_BLANC = couleur_blanc
 
-    #Chaqu'un doit avoir une façon de décider de son choix de promotion
     @abstractmethod
-    def choix_promotion(self, board, position):
-        """
-        Permet de décider le choix de promotion
-        :param board: État du board
-        :param position: Position de la piece
-        """
+    def get_promotion(self):
         pass
+
