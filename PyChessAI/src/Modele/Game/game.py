@@ -12,6 +12,8 @@ from Modele.Game.humain import Humain
 from Modele.Game.machine import Machine
 from Modele.Game.machine import TypeEngine
 from Modele.Game.memoire import Memoire
+from Modele.Engines.Komodo.komodo import Komodo
+from Modele.Engines.Gull.gull import Gull
 
 
 class Game:
@@ -209,3 +211,7 @@ class Game:
             return Stockfish(couleur, depth, self)
         elif type_engine is TypeEngine.LCZERO:
             return LCZero(couleur, self)
+        elif type_engine is TypeEngine.KOMODO:
+            return Komodo(couleur, depth, self)
+        elif type_engine is TypeEngine.GULL:
+            return Gull(couleur, depth, self)

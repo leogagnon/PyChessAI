@@ -46,7 +46,7 @@ class Chess():
         # Temps avant que les engines jouent leur tours (ms)
         self.DELAIS_ENGINE = 1000
 
-    def __game_loop(self):
+    def game_loop(self):
         """
         Fonctionnement logique de la partie
         """
@@ -115,7 +115,7 @@ class Chess():
             else:
                 self.game.next()
                 done = self.__check_mat()
-                pygame.time.wait(self.DELAIS_ENGINE)
+               # pygame.time.wait(self.DELAIS_ENGINE)
                 self.__board_to_interface()
 
             pygame.display.flip()
@@ -124,8 +124,8 @@ class Chess():
         
         if restart:
             chess_init = Chess()
-            chess_init.__intro_loop()
-            chess_init.__game_loop()
+            chess_init.intro_loop()
+            chess_init.game_loop()
 
     def __choix_quitter(self):
         options = ["Recommencer", "Quitter"]
@@ -157,7 +157,7 @@ class Chess():
         Fonctionnement logique de la conclusion
         """
 
-    def __intro_loop(self):
+    def intro_loop(self):
         """
         Fonctionnement logique de l'introduction
         """
@@ -257,7 +257,7 @@ class Chess():
         if ai is TypeEngine.ALPHA_BETA:
             depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=2, min_=1,
                                        max_=5)
-        elif ai is TypeEngine.STOCKFISH:
+        elif ai is TypeEngine.STOCKFISH or ai is TypeEngine.KOMODO or ai is TypeEngine.GULL:
             depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=10, min_=1,
                                        max_=20)
         return depth
@@ -304,7 +304,7 @@ class Chess():
         """
         Met à jour l'affichage en fonction de l'état de self.board
         """
-        self.liste_piece = [[None for i in range(8)] for j in range(8)]
+        self.liste_piece = [[None for _ in range(8)] for _ in range(8)]
 
         for i in range(len(self.game.board)):
             for j in range(len(self.game.board[i])):
@@ -397,5 +397,5 @@ class Chess():
 
 
 chess_init = Chess()
-chess_init.__intro_loop()
-chess_init.__game_loop()
+chess_init.intro_loop()
+chess_init.game_loop()
