@@ -3,6 +3,8 @@ from Modele.Game.enums import *
 
 
 class Memoire:
+    """Classe servant de mémoire pour une partie"""
+
     def __init__(self, game_board):
         # Board de la game
         self.board = game_board
@@ -18,9 +20,17 @@ class Memoire:
         # Tous les moves fait depuis le début de la partie
         self.tous_move = []
 
-    # !!! c'est important d'appeler cette méthode pour pouvoir avoir la capacité de undo
-    def move_made(self, position, lastPosition, piece, manger, special, promotion=None):
-        self.tous_move.append(Memoire.transform(position, lastPosition, piece, promotion))
+    def move_made(self, pos_initiale, pos_finale, piece, manger, special, promotion=None):
+        """
+        Enregistre un move effectué dans la mémoire
+        :param pos_initiale: Position initiale
+        :param pos_finale: Position finale
+        :param piece: Pièce déplacée
+        :param manger: Pièce mangée
+        :param special: MoveSpecial
+        :param promotion: Pièce promue
+        """
+        self.tous_move.append(Memoire.move_to_string(pos_initiale, pos_finale, piece, promotion))
         if special != MoveSpecial.NULL:
             self.memoire_speciale.append([special, self.numero_move])
         if manger is not None:
@@ -31,55 +41,57 @@ class Memoire:
         """
         Remet le board à son état précédent
         """
-        lastPosition, position, pieceBouger = self.undo_transform(
-            self.tous_move.pop())  # lastPosition, position, piece qui a été bouger
+        pos_initiale, pos_finale, piece = self.__undo_transform(self.tous_move.pop())
 
-        tempPiece = None
         if len(self.memoire_manger) != 0 and self.memoire_manger[-1][1] == self.numero_move - 1:
-            tempPiece = self.memoire_manger.pop()[0]
-        self.board[position[0]][position[1]] = tempPiece
-        self.board[lastPosition[0]][lastPosition[1]] = pieceBouger
-        self.board[lastPosition[0]][lastPosition[1]].position = lastPosition[:]
+            piece_mangee = self.memoire_manger.pop()[0]
+        else :
+            piece_mangee = None
+        self.board[pos_finale[0]][pos_finale[1]] = piece_mangee
+        self.board[pos_initiale[0]][pos_initiale[1]] = piece
+        self.board[pos_initiale[0]][pos_initiale[1]].position = pos_initiale[:]
 
         if len(self.memoire_speciale) != 0 and self.memoire_speciale[-1][1] == self.numero_move - 1:
             special = self.memoire_speciale.pop()[0]
             if special == MoveSpecial.PRISE_EN_PASSANT:  # prise en passant
-                self.board[position[0]][lastPosition[1]] = Modele.Elements.pion.Pion([position[0], lastPosition[1]],
-                                                                                     not pieceBouger.couleurBlanc)
-                self.board[position[0]][lastPosition[1]].first = False
-            elif special == MoveSpecial.PROMOTION:  # __promotion
-                self.board[lastPosition[0]][lastPosition[1]] = Modele.Elements.pion.Pion(lastPosition,
-                                                                                         pieceBouger.couleurBlanc)
-                self.board[lastPosition[0]][lastPosition[1]].first = False
-                self.board[lastPosition[0]][lastPosition[1]].second = False
+                self.board[pos_finale[0]][pos_initiale[1]] = Modele.Elements.pion.Pion([pos_finale[0], pos_initiale[1]],
+                                                                                     not piece.couleurBlanc)
+                self.board[pos_finale[0]][pos_initiale[1]].first = False
+            elif special == MoveSpecial.PROMOTION:
+                self.board[pos_initiale[0]][pos_initiale[1]] = Modele.Elements.pion.Pion(pos_initiale,piece.couleurBlanc)
+                self.board[pos_initiale[0]][pos_initiale[1]].first = False
+                self.board[pos_initiale[0]][pos_initiale[1]].second = False
             elif special == MoveSpecial.ROQUE:  # roque
-                self.board[lastPosition[0]][lastPosition[1]].moved = False
-                if position[0] == 6:
-                    self.board[7][position[1]] = Modele.Elements.tour.Tour([7, position[1]], pieceBouger.couleurBlanc)
-                    self.board[5][position[1]] = None
+                self.board[pos_initiale[0]][pos_initiale[1]].moved = False
+                if pos_finale[0] == 6:
+                    self.board[7][pos_finale[1]] = Modele.Elements.tour.Tour([7, pos_finale[1]], piece.couleurBlanc)
+                    self.board[5][pos_finale[1]] = None
                 else:
-                    self.board[0][position[1]] = Modele.Elements.tour.Tour([0, position[1]], pieceBouger.couleurBlanc)
-                    self.board[3][position[1]] = None
-            elif special == MoveSpecial.PREMIER_MOUVEMENT_TOUR:  # the rook has been moved for the first time
-                self.board[lastPosition[0]][lastPosition[1]].moved = False
-            elif special == MoveSpecial.PREMIER_MOUVEMENT_ROI:  # the king has been moved for the first time and did not do the roque
-                self.board[lastPosition[0]][lastPosition[1]].moved = False
+                    self.board[0][pos_finale[1]] = Modele.Elements.tour.Tour([0, pos_finale[1]], piece.couleurBlanc)
+                    self.board[3][pos_finale[1]] = None
+            elif special == MoveSpecial.PREMIER_MOUVEMENT_TOUR:
+                self.board[pos_initiale[0]][pos_initiale[1]].moved = False
+            elif special == MoveSpecial.PREMIER_MOUVEMENT_ROI:
+                self.board[pos_initiale[0]][pos_initiale[1]].moved = False
             elif special == MoveSpecial.PREMIER_MOUVEMENT_PION:  # first move of the pawn
-                self.board[lastPosition[0]][lastPosition[1]].first = True
-                self.board[lastPosition[0]][lastPosition[1]].second = True
-            elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE:  # the pawn could do his second move
-                self.board[lastPosition[0]][lastPosition[1]].second = True
+                self.board[pos_initiale[0]][pos_initiale[1]].first = True
+                self.board[pos_initiale[0]][pos_initiale[1]].second = True
+            elif special == MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE:
+                self.board[pos_initiale[0]][pos_initiale[1]].second = True
 
         self.numero_move -= 1
 
-    # prendre le string qui a été noté et output le move qui a été fait et avec quelle pièce
-    def undo_transform(self, string_move):
-        # Ignore les promotions : P:e7-e8(:Q)
+    def __undo_transform(self, string_move):
+        """
+        D'après un string de move, détermine quel a été le move effectué
+        :param string_move:
+        :return:
+        """
         split = string_move.split(":")
         piece_string, move = split[:2]
         lastPosition_string, position_string = move.split("-")
 
-        lastPosition, position = self.cipher(lastPosition_string), self.cipher(position_string)
+        lastPosition, position = self.string_to_position(lastPosition_string), self.string_to_position(position_string)
 
         pieceTemp = None
         if piece_string == "R":
@@ -100,43 +112,55 @@ class Memoire:
             pieceTemp.second = False
         return [lastPosition, position, pieceTemp]
 
-    # take a a1 and say it's position a1 -> [0,0]
     @staticmethod
-    def cipher(string_position):
-        return [ord(string_position[0]) - ord('a'), int(string_position[1]) - 1]
+    def string_to_position(algebraic_position):
+        """
+        Converti une position algébraic en coordonnée cartésienne
+        :param algebraic_position: String de la position (ex. a1)
+        :return: Coordonnée (ex. [0,0])
+        """
+        return [ord(algebraic_position[0]) - ord('a'), int(algebraic_position[1]) - 1]
 
-    # its meant to transform a move to a String (exemple) ->   "T:a1-b2" ou "P:e7-e8:Q" pour une __promotion
     @staticmethod
-    def transform(position, lastPosition, piece, promotion):
+    def move_to_string(pos_finale, pos_initiale, piece, promotion):
+        """
+        Génère un string qui représente un move (ex. P:e7-e8:Q (Pion va de e7 à e8 et effectue une promotion en reine))
+        :param pos_finale: Position initiale
+        :param pos_initiale: Position finale
+        :param piece: Adresse mémoire de la piece initiale (Objet PieceM)
+        :param promotion: Adresse mémoire de la piece promue (None si pas de promotion) (Objet PieceM)
+        :return:
+        """
+
         if isinstance(piece, Modele.Elements.roi.Roi):
-            letter = 'K'
+            lettre_piece = 'K'
         elif isinstance(piece, Modele.Elements.reine.Reine):
-            letter = 'Q'
+            lettre_piece = 'Q'
         elif isinstance(piece, Modele.Elements.tour.Tour):
-            letter = 'R'
+            lettre_piece = 'R'
         elif isinstance(piece, Modele.Elements.chevalier.Chevalier):
-            letter = 'N'
+            lettre_piece = 'N'
         elif isinstance(piece, Modele.Elements.fou.Fou):
-            letter = 'B'
+            lettre_piece = 'B'
         else:
-            letter = 'P'
+            lettre_piece = 'P'
 
-        letter_promotion = None
+        lettre_promotion = None
 
         if promotion is not None:
-            print(promotion)
-            if isinstance(promotion, Modele.Elements.roi.Roi):
-                letter_promotion = 'K'
-            elif isinstance(promotion, Modele.Elements.reine.Reine):
-                letter_promotion = 'Q'
-            elif isinstance(promotion, Modele.Elements.tour.Tour):
-                letter_promotion = 'R'
-            elif isinstance(promotion, Modele.Elements.chevalier.Chevalier):
-                letter_promotion = 'N'
-            elif isinstance(promotion, Modele.Elements.fou.Fou):
-                letter_promotion = 'B'
-            else:
-                letter_promotion = 'P'
 
-        return letter + ":" + chr(ord('a') + lastPosition[0]) + str(lastPosition[1] + 1) + "-" + chr(
-            ord('a') + position[0]) + str(position[1] + 1) + ('' if promotion is None else ":" + letter_promotion)
+            if isinstance(promotion, Modele.Elements.roi.Roi):
+                lettre_promotion = 'K'
+            elif isinstance(promotion, Modele.Elements.reine.Reine):
+                lettre_promotion = 'Q'
+            elif isinstance(promotion, Modele.Elements.tour.Tour):
+                lettre_promotion = 'R'
+            elif isinstance(promotion, Modele.Elements.chevalier.Chevalier):
+                lettre_promotion = 'N'
+            elif isinstance(promotion, Modele.Elements.fou.Fou):
+                lettre_promotion = 'B'
+            else:
+                lettre_promotion = 'P'
+
+        return lettre_piece + ":" + chr(ord('a') + pos_initiale[0]) + str(pos_initiale[1] + 1) + "-" + chr(
+            ord('a') + pos_finale[0]) + str(pos_finale[1] + 1) + ('' if promotion is None else ":" + lettre_promotion)

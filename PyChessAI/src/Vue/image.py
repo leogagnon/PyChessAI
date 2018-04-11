@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 
 class Image(ABC):
+
     def __init__(self, nom, position):
         """
         Toute forme d'image utilisée dans le programme
@@ -14,7 +15,14 @@ class Image(ABC):
         self.image = None
         self.dimension = None
         self.init_image()
-        self.init_dimension()
+        self.__init_dimension()
+
+    def blit(self, screen):
+        """
+        Affiche l'image sur l'écran
+        :param screen: Écran sur laquelle afficher
+        """
+        screen.blit(self.image, self.position)
 
     def init_image(self):
         """
@@ -23,18 +31,11 @@ class Image(ABC):
         """
         self.image = pygame.image.load("Vue\images\\" + self.nom + ".png")
 
-    def init_dimension(self):
+    def __init_dimension(self):
         """
         Initialise les dimentions de l'image
         """
         self.dimension = self.image.get_rect().size
-
-    def blit(self, screen):
-        """
-        Affiche l'image sur l'écran
-        :param screen: Écran sur laquelle afficher
-        """
-        screen.blit(self.image, self.position)
 
     @staticmethod
     def DIMENSION_CASE():

@@ -22,8 +22,8 @@ class UCIP_Engine(Machine, ABC):
         self.engine.set_position(self.get_liste_moves(self.game.memoire.tous_move))
         best_move = self.engine.get_best_move()
         best_move = self.check_promotion(best_move)
-        self.lastPosition = Memoire.cipher(best_move[:2])
-        self.position = Memoire.cipher(best_move[-2:])
+        self.lastPosition = Memoire.string_to_position(best_move[:2])
+        self.position = Memoire.string_to_position(best_move[-2:])
 
         return (self.lastPosition, self.position)
 
