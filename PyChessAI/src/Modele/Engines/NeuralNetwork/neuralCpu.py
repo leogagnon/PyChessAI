@@ -12,8 +12,9 @@ from Modele.Game.machine import Machine
 
 
 class NeuralMachine(Machine):
-    def __init__(self, couleur):
-        super().__init__(couleur)
+    def __init__(self, couleur, game):
+        super().__init__(couleur, game)
+        self.board = self.game.board
         self.nn = Network(66)
         self.havePlayed = False
 
@@ -120,17 +121,13 @@ class NeuralMachine(Machine):
             targetList = pickle.load(f)
         return targetList
 
-    def play(self, board):
+    def play(self):
         self.position = None
         self.lastPosition = None
-        self.remplirWeight("Modele\AI\\NeuralNetwork\weights")
-        move = self.nn.calulate(board, self.COULEUR_BLANC, Modele.Game.memoire.Memoire.numero_move)
-        self.lastPosition , self.position = move[0], move[1]
+        self.remplirWeight("Modele\Engines\\NeuralNetwork\weights")
+        move = self.nn.calulate(self.board, self.COULEUR_BLANC, self.game.memoire.numero_move)
 
-        pieceTemp = board[self.position[0]][self.position[1]]
-        special = board[self.lastPosition[0]][self.lastPosition[1]].mouvementMemory(self.position, self.lastPosition, board)
-        Modele.Game.memoire.Memoire.move_made(self.position, self.lastPosition, board[self.position[0]][self.position[1]], pieceTemp, special)
-        return special
+        return move[0], move[1]
 
     def remplirWeight(self, path):
         temp = []

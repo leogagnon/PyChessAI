@@ -14,6 +14,7 @@ from Modele.Game.machine import TypeEngine
 from Modele.Game.memoire import Memoire
 from Modele.Engines.Komodo.komodo import Komodo
 from Modele.Engines.Gull.gull import Gull
+from Modele.Engines.NeuralNetwork.neuralCpu import NeuralMachine
 
 
 class Game:
@@ -206,7 +207,7 @@ class Game:
         if type_engine is TypeEngine.ALPHA_BETA:
             return AlphaBeta(couleur, depth, self)
         elif type_engine is TypeEngine.NEURAL_NETWORK:
-            return  # NeuralNetwork(couleur)
+            return NeuralMachine(couleur, self)
         elif type_engine is TypeEngine.STOCKFISH:
             return Stockfish(couleur, depth, self)
         elif type_engine is TypeEngine.LCZERO:
