@@ -8,7 +8,7 @@ class NeuralMachine(Machine):
     def __init__(self, couleur, game):
         super().__init__(couleur, game)
         self.board = self.game.board
-        self.nn = Network(66)
+        self.nn = Network(65)
         self.remplirWeight("Modele\Engines\\NeuralNetwork\weights")
         self.havePlayed = False
 
@@ -16,7 +16,7 @@ class NeuralMachine(Machine):
         self.position = None
         self.lastPosition = None
 
-        move = self.nn.calulate(self.board, self.COULEUR_BLANC, self.game.memoire.numero_move)
+        move = self.nn.calulate(self.board, self.COULEUR_BLANC)
 
         return move[0], move[1]
 

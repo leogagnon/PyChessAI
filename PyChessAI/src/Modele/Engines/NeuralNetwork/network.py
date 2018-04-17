@@ -62,7 +62,7 @@ class Network:
                                 allMoves.append([lastPosition, [temp1, temp2]])
         return allMoves
 
-    def createInput(self, board, couleur, numero_move):
+    def createInput(self, board, couleur):
         self.input = []
         for i in board:
             for j in i:
@@ -83,10 +83,9 @@ class Network:
                     self.input.append(PieceChess.NONE.value)
         color_value = 0 if couleur else 1
         self.input.append(color_value)
-        self.input.append(numero_move)
 
-    def calulate(self, board, couleur, numero_move):
-        self.createInput(board, couleur, numero_move)
+    def calulate(self, board, couleur):
+        self.createInput(board, couleur)
         self.remplir()
         allMoves = self.createAllMoves(board, couleur)
         indexBest, score = -1, -1
@@ -103,13 +102,13 @@ class Network:
         return allMoves[indexBest]
 
 
-    def learning(self, board, couleur, targetList, numero_move):
+    def learning(self, board, couleur, targetList):
         '''
         Cela est la partie où le programme essaye d'apprendre en ajustant tout simplement ces weights selon les fonctions dans les perceptrons et les targets (ce que des pros auraient joués)
         :param input: le input est le board dans un array et où les pièces sont remplacé par des valeurs numérique
         :return:
         '''
-        self.createInput(board, couleur, numero_move)
+        self.createInput(board, couleur)
         self.remplir()
         for i in range(len(self.layers)): # le numéro du layer
             for j in range(len(self.layers[i])): #parcours les percetrons du layer

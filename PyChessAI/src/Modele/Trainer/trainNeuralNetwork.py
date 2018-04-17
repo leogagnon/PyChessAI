@@ -14,7 +14,7 @@ class TrainNeuralNetwork:
     def __init__(self, couleur):
         self.couleur = couleur
         self.RELATIVE_PATH = "../Engines/NeuralNetwork/"
-        self.nn = Network(66)
+        self.nn = Network(65)
 
     def train(self):
         depart = 0
@@ -37,7 +37,7 @@ class TrainNeuralNetwork:
             self.initPiece()
             numero_move = 0
             for i in targetList:
-                self.nn.learning(self.board, couleurBlanc, i[0:2], numero_move)
+                self.nn.learning(self.board, couleurBlanc, i[0:2])
                 self.mouvementMemory(i[0], i[1], i[2])
                 couleurBlanc = not couleurBlanc
                 numero_move += 1
