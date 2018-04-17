@@ -132,27 +132,28 @@ class Game:
 
         if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
             if self.board[pos_finale[0]][pos_finale[1]].first:
-                self.board[pos_finale[0]][pos_finale[1]].first = False
                 special = MoveSpecial.PREMIER_MOUVEMENT_PION
+            elif not self.board[pos_finale[0]][pos_finale[1]].second:
+                if special is None:
+                    special = MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE
+
+        # Effectue la prise en passant
+        if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
+            if self.board[pos_finale[0]][pos_finale[1]].first:
+                for temp in self.board:
+                    for temp2 in temp:
+                        if isinstance(temp2, Pion) and temp2.second:
+                            temp2.second = False
+                self.board[pos_finale[0]][pos_finale[1]].first = False
+                if abs(pos_initiale[1] - pos_finale[1]) == 2:
+                    self.board[pos_finale[0]][pos_finale[1]].second = True
             elif self.board[pos_finale[0]][pos_finale[1]].second:
-                special = MoveSpecial.PRISE_EN_PASSANT_IMPOSSIBLE
-                # Effectue la prise en passant
-                if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
-                    if self.board[pos_finale[0]][pos_finale[1]].first:
-                        for temp in self.board:
-                            for temp2 in temp:
-                                if isinstance(temp2, Pion) and temp2.second:
-                                    temp2.second = False
-                        self.board[pos_finale[0]][pos_finale[1]].first = False
-                        if abs(pos_initiale[1] - pos_finale[1]) == 2:
-                            self.board[pos_finale[0]][pos_finale[1]].second = True
-                    elif self.board[pos_finale[0]][pos_finale[1]].second:
-                        self.board[pos_finale[0]][pos_finale[1]].second = False
-                else:
-                    for temp in self.board:
-                        for temp2 in temp:
-                            if isinstance(temp2, Pion) and temp2.second:
-                                temp2.second = False
+                self.board[pos_finale[0]][pos_finale[1]].second = False
+        else:
+            for temp in self.board:
+                for temp2 in temp:
+                    if isinstance(temp2, Pion) and temp2.second:
+                        temp2.second = False
 
         if isinstance(self.board[pos_finale[0]][pos_finale[1]], Pion):
             if pos_finale[1] == 7 or pos_finale[1] == 0:

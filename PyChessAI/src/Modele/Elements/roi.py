@@ -63,11 +63,11 @@ class Roi(PieceM):
     # voir si un move est acceptable (c'est-à dire est ce qu'en bougeant cela va faire en sorte qu'un roi qui n'est pas mat se mette en état d'échec)
     def acceptableMove(self, moves, board, position):
         initial = position[:]
-
+        # regarde à travers tout les moves possibles
         for i in range(len(moves)):
             for j in range(len(moves[i])):
-                if moves[i][j]:
-                    if board[i][j] != None:
+                if moves[i][j]:#le move est possible
+                    if board[i][j] != None: #il y a une pièce sur la case
                         erasedPiece = board[i][j]
                         self.testMouvementMemory([i, j], initial, board)
                         if self.echec(board, self.couleurBlanc):
@@ -75,15 +75,14 @@ class Roi(PieceM):
                         self.testMouvementMemory(initial, [i, j], board)
                         board[i][j] = erasedPiece
                     else:
-                        if isinstance(board[initial[0]][initial[1]], Modele.Elements.roi.Roi) and initial[0] == 4:
-                            if moves[initial[0] + 2][initial[1]]:
+                        if isinstance(board[initial[0]][initial[1]], Modele.Elements.roi.Roi) and initial[0] == 4: # c'est une tentative de roque
+                            if moves[initial[0] + 2][initial[1]]:  #voir si le roque à droite est légal
                                 if self.echec(board, self.couleurBlanc):
                                     moves[initial[0] + 2][initial[1]] = False
                                 elif not moves[initial[0] + 1][initial[1]]:
-                                    print(initial[0] + 2)
                                     moves[initial[0] + 2][initial[1]] = False
-                            elif moves[initial[0] - 2][initial[1]]:
-                                if self.echec(board, self.couleurBlanc):
+                            elif moves[initial[0] - 2][initial[1]]: #voir si le roque à gauche est légal
+                                if self.echec(board, self.couleurBlanc): # si le roi est en échec il ne peut pas faire le roque
                                     moves[initial[0] - 2][initial[1]] = False
                                 else:
                                     self.testMouvementMemory([initial[0] - 1, initial[1]], initial, board)

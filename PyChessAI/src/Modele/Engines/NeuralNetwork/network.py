@@ -142,8 +142,6 @@ class Network:
             return answer * (target - self.layers[layer][numero_perceptron].output)
 
 
-        for i in range(len(self.layers[layer])):# tous les perceptrons dans le layer
-            sub_total = self.recursive_function(layer+1, i, targetList)
-            for j in range(len(self.layers[layer+1])): # parcourir
-                answer += sub_total * self.layers[layer+1][j].weights[i]
-            return answer
+        for k in range(len(self.layers[layer+1])):
+            answer += self.recursive_function(layer+1, k, targetList) * self.layers[layer+1][k].weights[numero_perceptron]
+        return answer

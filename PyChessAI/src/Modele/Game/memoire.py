@@ -61,7 +61,7 @@ class Memoire:
                 self.board[pos_initiale[0]][pos_initiale[1]] = Modele.Elements.pion.Pion(pos_initiale,piece.couleurBlanc)
                 self.board[pos_initiale[0]][pos_initiale[1]].first = False
                 self.board[pos_initiale[0]][pos_initiale[1]].second = False
-            elif special == MoveSpecial.ROQUE:  # roque
+            elif special == MoveSpecial.ROQUE:
                 self.board[pos_initiale[0]][pos_initiale[1]].moved = False
                 if pos_finale[0] == 6:
                     self.board[7][pos_finale[1]] = Modele.Elements.tour.Tour([7, pos_finale[1]], piece.couleurBlanc)
