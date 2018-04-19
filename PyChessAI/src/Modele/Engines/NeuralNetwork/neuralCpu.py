@@ -13,11 +13,8 @@ class NeuralMachine(Machine):
         self.havePlayed = False
 
     def play(self):
-        self.position = None
-        self.lastPosition = None
 
         move = self.nn.calulate(self.board, self.COULEUR_BLANC)
-
         return move[0], move[1]
 
     def remplirWeight(self, path):

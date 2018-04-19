@@ -6,6 +6,17 @@ from Modele.Game.machine import Machine
 class AlphaBeta(Machine):
     """Simple implémentation de l'algorithme alpha-bêta (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )"""
 
+    def __init__(self, couleur, depth, game):
+        self.board = None
+        self.bestScore = -300
+        self.depth = depth
+        self.lastPosition = None
+        self.position = None
+        super().__init__(couleur, game)
+
+        # Promotion fixé à reine
+        self.promotion = TypePiece.REINE
+
     def play(self):
         """
         Voir méthode mère
@@ -17,15 +28,6 @@ class AlphaBeta(Machine):
         self.__alphabeta_max(-300, 300, self.depth)
 
         return (self.lastPosition, self.position)
-
-    def __init__(self, couleur, depth, game):
-        self.board = None
-        self.bestScore = -300
-        self.depth = depth
-        super().__init__(couleur, game)
-
-        # Promotion fixé à reine
-        self.promotion = TypePiece.REINE
 
     def __evaluate(self, board):
         """

@@ -12,22 +12,25 @@ class TypeEngine(Enum):
     MINIMAX = 'MiniMax classique'
     KOMODO = 'Komodo'
     GULL = 'Gull'
-    FIRE = 'Fire'
-
 
 # Voici la classe abstraite pour tous nos Engines (vu que ceux-ci doivent partager des caractéristiques communes)
 class Machine(Joueur, ABC):
-    # constructeur
     def __init__(self, couleur, game):
+
+        #Contient le choix de promotion qui vient d'être fait (None si aucun)
         self.promotion = None
-        self.position = None
-        self.lastPosition = None
+
+        #Game dont la machine fait partie
         self.game = game
+
         super().__init__(couleur)
 
-    # Cela est une méthode abstraite qui va faire en sorte de rouler l'algorithme du Engines sélectionner par l'usager
     @abstractclassmethod
     def play(self):
+        """
+        Méthode appelée pour faire jouer un coup au engine
+        :return: Le meilleur move
+        """
         pass
 
     def get_promotion(self):

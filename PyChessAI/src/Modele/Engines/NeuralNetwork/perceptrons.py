@@ -1,5 +1,6 @@
 import random
-import math
+import cmath
+
 
 class Perceptrons:
     def __init__(self, size_input):
@@ -33,7 +34,7 @@ class Perceptrons:
             return 1
         elif x <= -100:
             return 0
-        return 1/(1 + math.pow(math.e, -x))
+        return 1/(1 + cmath.pow(cmath.e, -x))
     @staticmethod
     def deriveSigmoid(x):
         '''
