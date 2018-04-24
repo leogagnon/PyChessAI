@@ -15,9 +15,10 @@ from Modele.Game.game import Game
 from Vue.bouton import Bouton
 from Vue.image import Image
 from Modele.Game.humain import Humain
-from Modele.Game.enums import ModeDeJeu, TypePiece, MoveSpecial
+from Modele.Game.enums import ModeDeJeu, TypePiece
 import sys
 import easygui_qt
+import easygui
 
 
 class Chess():
@@ -45,6 +46,11 @@ class Chess():
 
         # Temps avant que les engines jouent leur tours (ms)
         self.DELAIS_ENGINE = 1000
+
+        self.intro_loop()
+        self.game_loop()
+
+
 
     def game_loop(self):
         """
@@ -393,7 +399,4 @@ class Chess():
                 if j is not None:
                     j.blit(self.screen)
 
-
-chess_init = Chess()
-chess_init.intro_loop()
-chess_init.game_loop()
+chess = Chess()

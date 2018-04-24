@@ -11,7 +11,6 @@ class UCIP_Engine(Machine, ABC):
 
     def __init__(self, couleur, depth, game, command):
         self.engine = UCIP(command=command, depth=depth)
-        self.promotion = None
         super().__init__(couleur, game)
 
     def play(self):
@@ -22,10 +21,10 @@ class UCIP_Engine(Machine, ABC):
         self.engine.set_position(self.get_liste_moves(self.game.memoire.tous_move))
         best_move = self.engine.get_best_move()
         best_move = self.check_promotion(best_move)
-        self.lastPosition = Memoire.string_to_position(best_move[:2])
-        self.position = Memoire.string_to_position(best_move[-2:])
+        lastPosition = Memoire.string_to_position(best_move[:2])
+        position = Memoire.string_to_position(best_move[-2:])
 
-        return (self.lastPosition, self.position)
+        return (lastPosition, position)
 
     def get_liste_moves(self, tous_moves):
         """
@@ -56,6 +55,7 @@ class UCIP_Engine(Machine, ABC):
         :param move: Move donné par l'engine (ex. e6e7 ou e7e8q pour promotion)
         :return: Le move donné en paramètre (moin la promotion si il y en avait une)
         """
+        #Si il y a une promotion
         if len(move) == 5:
 
             choix = move[4]
@@ -68,5 +68,8 @@ class UCIP_Engine(Machine, ABC):
                 self.promotion = TypePiece.FOU
             elif choix == 'n':
                 self.promotion = TypePiece.CAVALIER
+        #Si il n'y en a pas
+        else:
+            self.promotion = None
 
         return move[:4]
