@@ -10,13 +10,13 @@ class Perceptrons:
         self.weights = []
         self.initWeight(size_input)
         self.output = 0
+        self.totalInput = 0
 
     def initWeight(self, size_input):
         '''
         Donne des valeurs random au weights qui vont ensuite se faire changer pour modéliser la situation idéale
         :param size_input: la quantité de inputs pour savoir combien de weights on a besoin de créer
         '''
-
         for i in range(size_input):
             self.weights.append(random.random())
 
@@ -29,9 +29,9 @@ class Perceptrons:
         :param x: le point qu'on a besoin de l'image
         :return: la valeur de l'image
         '''
-        if x >= 100:
+        if x >= 50:
             return 1
-        elif x <= -100:
+        elif x <= -50:
             return 0
         return 1/(1 + math.pow(math.e, -x))
     @staticmethod
@@ -41,4 +41,6 @@ class Perceptrons:
         :param x: Le point qu'on a besoin de l'image de la dérivé de sigmoid
         :return: la valeur de l'image
         '''
-        return Perceptrons.sigmoid(x) * (1 - Perceptrons.sigmoid(x))
+        calculated = Perceptrons.sigmoid(x)
+        return  calculated * (1 - calculated)
+

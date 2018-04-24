@@ -11,35 +11,24 @@ class Network:
         Créer le neural network (NN)
         :param input_size: va dire au NN la dimension du input qui s'en vient pour que la quantité de weights par perceptrons soit approprié
         '''
-        nombre_layers = [50,40,32]
+        nombre_layers = [15,10,32]
         input_sizes = [input_size] + nombre_layers[0:len(nombre_layers)-1]
         self.layers = [[Perceptrons(input_sizes[i]) for _ in range(nombre_layers[i])] for i in range(len(nombre_layers))]
         self.input = None
-        self.index_targetList = 0
 
     def remplir(self):
         '''
-        remplir les outputs de chacun des perceptrons
+        remplir les totals inputs et les outputs de tous les perceptrons
         :param input: va donner les inputs pour le premier layer du NN
         '''
-        for i in range(len(self.layers[0])):
-            self.layers[0][i].output = Perceptrons.sigmoid(sum(self.input[j]*self.layers[0][i].weights[j] for j in range(len(self.input))))
-        if len(self.layers) > 1:
-            for i in range(1, len(self.layers)): # from the first layer to the end
-                for j in range(len(self.layers[i])): #for all the perceptrons in that layer
-                    total = sum(self.layers[i-1][k].output * self.layers[i][j].weights[k] for k in range(len(self.layers[i-1])))
-                    self.layers[i][j].output = Perceptrons.sigmoid(total)
 
-    def totalInput(self, number_neuron, layer):
-        '''
-        prendre le total des inputs * les weights d'un perceptrons donnés
-        :param number_neuron: savoir de quel perceptron on est entrain de parler
-        :param layer: où se trouve le perceptron dans les layers
-        :return: va return le total des inputs*les weights
-        '''
-        if layer == 0:
-            return sum(self.layers[layer][number_neuron].weights[i] * self.input[i] for i in range(len(self.input)))
-        return sum(self.layers[layer][number_neuron].weights[i] * self.layers[layer-1][i].output for i in range(len(self.layers[layer-1])))
+        for i in range(len(self.layers)):
+            for j in range(len(self.layers[i])):
+                if i == 0 :
+                    self.layers[i][j].totalInput = sum(self.input[k] * self.layers[i][j].weights[k] for k in range(len(self.input)))
+                else:
+                    self.layers[i][j].totalInput = sum(self.layers[i-1][k].output * self.layers[i][j].weights[k] for k in range(len(self.layers[i][j].weights)))
+                self.layers[i][j].output = Perceptrons.sigmoid(self.layers[i][j].totalInput)
 
     def createAllMoves(self, board, couleur):
         '''
@@ -64,15 +53,16 @@ class Network:
 
     def createInput(self, board, couleur):
         self.input = []
+
         for i in board:
             for j in i:
-                multiplier = 1 if j is not None and j.couleurBlanc else -1
+                multiplier = 1/6 if j is not None and j.couleurBlanc else -1/6
                 if isinstance(j, Modele.Elements.pion.Pion):
                     self.input.append(multiplier*PieceChess.PION.value)
                 elif isinstance(j, Modele.Elements.chevalier.Chevalier):
                     self.input.append(multiplier*PieceChess.CAVALIER.value)
                 elif isinstance(j, Modele.Elements.fou.Fou):
-                    self.input.append(multiplier*multiplier*PieceChess.FOU.value)
+                    self.input.append(multiplier*PieceChess.FOU.value)
                 elif isinstance(j, Modele.Elements.tour.Tour):
                     self.input.append(multiplier*PieceChess.TOUR.value)
                 elif isinstance(j, Modele.Elements.reine.Reine):
@@ -81,12 +71,27 @@ class Network:
                     self.input.append(multiplier*PieceChess.ROI.value)
                 else:
                     self.input.append(PieceChess.NONE.value)
-        color_value = 0 if couleur else 1
+        color_value = -5 if couleur else 5
         self.input.append(color_value)
 
     def calulate(self, board, couleur):
+
         self.createInput(board, couleur)
         self.remplir()
+        print("weights")
+        for i in self.layers:
+            print("######### séparation de layer #########")
+            for j in i:
+                print(j.weights)
+        print("\n")
+
+        print("*********** Outputs **************")
+        for i in self.layers:
+            print("######### séparation de layer #########")
+            message = ""
+            for j in i:
+                message += str(j.output) + "   "
+            print(message)
         allMoves = self.createAllMoves(board, couleur)
         indexBest, score = -1, -1
 
@@ -95,8 +100,7 @@ class Network:
             for j in range(len(allMoves[i])):
                 for k in range(len(allMoves[i][j])):
                     subtotal *= self.layers[len(self.layers)-1][allMoves[i][j][k] + (k+2*j)*8].output
-
-            #print("move = " + str(allMoves[i]) + " ; subtotal = " + str(subtotal))
+            print("move = " + str(allMoves[i]) + " ; subtotal = " + str(subtotal))
             if subtotal > score:
                 indexBest, score = i, subtotal
         return allMoves[indexBest]
@@ -110,14 +114,23 @@ class Network:
         '''
         self.createInput(board, couleur)
         self.remplir()
-        for i in range(len(self.layers)): # le numéro du layer
-            for j in range(len(self.layers[i])): #parcours les percetrons du layer
-                for k in range(len(self.layers[i][j].weights)): #parcours les weights du perceptron
-                    self.layers[i][j].weights[k] -= self.recursive_function(i,j,targetList) * self.outputPerceptronBefore(i, k)
+        '''
+        for l in range(len(self.layers)):  # le numéro du layer
+            for i in range(len(self.layers[l])):  # parcours les percetrons du layer
+                print(self.layers[l][i].weights)
+        '''
+        for l in range(len(self.layers)): # le numéro du layer
+            for i in range(len(self.layers[l])): #parcours les percetrons du layer
+                backpropagation = self.recursive_function(l, i, targetList)
+                #print(backpropagation)
+                for j in range(len(self.layers[l][i].weights)): #parcours les weights du perceptron
+                    before = self.outputPerceptronBefore(l, j)
+                    if before != 0:
+                        self.layers[l][i].weights[j] += backpropagation * before
 
     def outputPerceptronBefore(self, layer, numero_perceptron):
         '''
-        Va return le output du perceptron qui est pointé (si c'est le premeir layer le ouput est la valeur numérique à une postion dans le array qui représente le board)
+        Va return le output du perceptron qui est pointé (si c'est le premeir layer le output est la valeur numérique à une postion dans le array qui représente le board)
         :param layer: le layer où le perceptron se trouve
         :param numero_perceptron: l'index où se trouve le perceptron
         :return: Return le output
@@ -134,13 +147,9 @@ class Network:
         :param target: ce que le joueur professionnel aurait fait
         '''
 
-        answer = Perceptrons.deriveSigmoid(self.totalInput(numero_perceptron, layer))
+        answer = Perceptrons.deriveSigmoid(self.layers[layer][numero_perceptron].totalInput)
         if layer == len(self.layers)-1:
             value = targetList[int(numero_perceptron/16)][int(numero_perceptron/8) - 2*int(numero_perceptron/16)]
-            target = 1 if value == numero_perceptron % 8 else 0
+            target = 1 if value == numero_perceptron%8 else 0
             return answer * (target - self.layers[layer][numero_perceptron].output)
-
-
-        for k in range(len(self.layers[layer+1])):
-            answer += self.recursive_function(layer+1, k, targetList) * self.layers[layer+1][k].weights[numero_perceptron]
-        return answer
+        return answer * sum(self.recursive_function(layer+1, k, targetList) * self.layers[layer+1][k].weights[numero_perceptron] for k in range(len(self.layers[layer+1])))

@@ -110,8 +110,6 @@ class Chess():
 
                             easygui_qt.show_message(liste_moves,'Liste des moves')
 
-
-
             else:
                 self.game.next()
                 done = self.__check_mat()

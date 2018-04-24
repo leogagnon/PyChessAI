@@ -7,7 +7,6 @@ from Modele.Elements.roi import Roi
 from Modele.Elements.tour import Tour
 from Modele.Engines.NeuralNetwork.network import Network
 from Modele.Game.enums import TypePiece
-from Modele.Game.game import Game
 
 
 class TrainNeuralNetwork:
@@ -48,6 +47,7 @@ class TrainNeuralNetwork:
                     temp.append(j.weights)
                 enter.append(temp)
 
+            
             with open(self.RELATIVE_PATH + "weights.pkl", "wb") as f:
                 pickle.dump(enter, f)
             file = open(self.RELATIVE_PATH + "infoWeight.txt", "w")
