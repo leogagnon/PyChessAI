@@ -30,7 +30,7 @@ class Memoire:
         :param special: MoveSpecial
         :param promotion: Pièce promue
         """
-        self.tous_move.append(Memoire.move_to_string(pos_initiale, pos_finale, piece, promotion))
+        self.tous_move.append(Memoire.__move_to_string(pos_initiale, pos_finale, piece, promotion))
         if special != MoveSpecial.NULL:
             self.memoire_speciale.append([special, self.numero_move])
         if manger is not None:
@@ -122,14 +122,14 @@ class Memoire:
         return [ord(algebraic_position[0]) - ord('a'), int(algebraic_position[1]) - 1]
 
     @staticmethod
-    def move_to_string(pos_finale, pos_initiale, piece, promotion):
+    def __move_to_string(pos_finale, pos_initiale, piece, promotion):
         """
         Génère un string qui représente un move (ex. P:e7-e8:Q (Pion va de e7 à e8 et effectue une promotion en reine))
         :param pos_finale: Position initiale
         :param pos_initiale: Position finale
         :param piece: Adresse mémoire de la piece initiale (Objet PieceM)
         :param promotion: Adresse mémoire de la piece promue (None si pas de promotion) (Objet PieceM)
-        :return:
+        :return: C'est le string qui va indiquer le mouvement qui a été jouer (ex: N:f3-e5)
         """
 
         if isinstance(piece, Modele.Elements.roi.Roi):

@@ -10,12 +10,18 @@ from Modele.Game.enums import TypePiece
 
 
 class TrainNeuralNetwork:
-    def __init__(self, couleur):
-        self.couleur = couleur
+    def __init__(self):
+        '''
+        Cette classe aura pour but de train le neural network (c-a-d changer la valeur de ces weights)
+        '''
+        self.couleur = True
         self.RELATIVE_PATH = "../Engines/NeuralNetwork/"
         self.nn = Network(65)
 
     def train(self):
+        '''
+        Entrainer le NN à le rendre meilleur
+        '''
         depart = 0
         try:
             file = open(self.RELATIVE_PATH + "infoWeight.txt", "r")
@@ -103,6 +109,12 @@ class TrainNeuralNetwork:
                 self.board[position[0]][position[1]].moved = True
 
     def __promotion(self, position, promotedPiece):
+        '''
+        Transformer un pion en une pièce de son choix
+        :param position: la position du pion à transformer
+        :param promotedPiece: La pièce qui va substituer le pion (c'est le enum TypePiece )
+        :return:
+        '''
         if promotedPiece == TypePiece.REINE:
             self.board[position[0]][position[1]] = Reine(position, self.couleur)
         elif promotedPiece == TypePiece.TOUR:
@@ -139,6 +151,10 @@ class TrainNeuralNetwork:
             self.board[i][6] = Pion([i, 6], False)
 
     def remplirWeight(self, path):
+        '''
+        Remplir les weights dans le NN (pour pouvoir repartir un training sans devoir recommencer du début)
+        :param path: c'est le path du fichier qui a les weights
+        '''
         temp = []
         with open(path + ".pkl", "rb") as f:
             temp = pickle.load(f)
@@ -146,5 +162,5 @@ class TrainNeuralNetwork:
             for j in range(len(temp[i])):
                 self.nn.layers[i][j].weights = temp[i][j][:]
 
-lol = TrainNeuralNetwork(True)
+lol = TrainNeuralNetwork()
 lol.train()

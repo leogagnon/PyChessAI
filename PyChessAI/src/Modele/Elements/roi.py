@@ -7,11 +7,21 @@ import Modele
 class Roi(PieceM):
     # constructeur
     def __init__(self, position, couleurBlanc):
+        '''
+        C'est le constructeur qui va représenter un roi sur l'échiquier
+        :param position: c'est la position que le chevalier occupe sur l'échiquier (c'est une position bidimensionnelle x et y qui peuvent prendre les valeurs entières de 0 à 7)
+        :param couleurBlanc: c'est la couleur de la pièce (true -> elle est blanche ; False -> elle est noire)
+        '''
         super().__init__(position, couleurBlanc, 200)
         self.moved = False
 
     # voir où sa se fait override (pieceM possibiliteBouger)
     def possibiliteBouger(self, board):
+        '''
+        Cette méthode a pour utilité de déterminer tous les mouvements que peut faire le roi (sans tenir compte si cela va mettre en danger le roi)
+        :param board: C'est une matrice 8x8 qui contient toutes les pièces (les instances provenant du modèle) de l'échiquier
+        :return: La méthode retourne une matrice booléenne 8x8 (c'est true où la pièce peut se déplacer)
+        '''
         moves = [[False for _ in range(8)] for _ in range(8)]
         direction = [-1, 0, 1]
         test = []
@@ -39,6 +49,11 @@ class Roi(PieceM):
     # Voir toutes les places qui sont touchés par un adversaire
     # Va être essentiel pour la méthode echec dans la classe Roi
     def opponentMoves(self, board):
+        '''
+        Va donner une matrice booléenne 8x8 qui va représenter toutes les positions qui sont accessibles par les adversaires (True -> accessible ; False -> pas accessible)
+        :param board: une matrice 8x8 qui va contenir les pièces de l'échiquier
+        :return: la matrice booléenne 8x8 qui va contenir les positions accessibles par l'équipe adverse
+        '''
         moves = [[False for _ in range(8)] for _ in range(8)]
 
         for temp in board:
@@ -54,6 +69,12 @@ class Roi(PieceM):
 
     # Voir si votre roi est en état d'échec
     def echec(self, board, couleurBlanc):
+        '''
+        Voir si notre roi est en échec
+        :param board: la matrice 8x8 qui contient les pièces de l'échiquier
+        :param couleurBlanc: la couleur du roi que vous voulez voir s'il est en échec
+        :return: Valeur booléenne -> si c'est en échec
+        '''
         positionRoi = PieceM.trouverRoi(board, couleurBlanc)
         others = self.opponentMoves(board)
         if others[positionRoi[0]][positionRoi[1]]:
@@ -62,6 +83,12 @@ class Roi(PieceM):
 
     # voir si un move est acceptable (c'est-à dire est ce qu'en bougeant cela va faire en sorte qu'un roi qui n'est pas mat se mette en état d'échec)
     def acceptableMove(self, moves, board, position):
+        '''
+        Changer la matrice moves pour tenir compte de la légalité du move (si le mouvement met le roi en échec)
+        :param moves: une matrice booléenne 8x8 qui représente où c'est légal de se déplacer
+        :param board: une matrice 8x8 qui contient toutes les pièces de l'échiquier
+        :param position: la position initiale de la pièce qui veut se déplacer
+        '''
         initial = position[:]
         # regarde à travers tout les moves possibles
         for i in range(len(moves)):
@@ -97,16 +124,26 @@ class Roi(PieceM):
                         self.testMouvementMemory(initial, [i, j], board)
 
     # voir si une pièce peut au moins faire un move (utile pour la méthode mat)
-    def onlyLegal(self, temp):
+    def onlyLegal(self, moves):
+        '''
+        Voir si la matrice moves a au moins un move possible
+        :param moves: C'est une matrice booléenne 8x8 qui représente toutes les positions qu'une pièce peut bouger  si true -> peut bouger else ne peut pas
+        :return: Si la pièce peut au moins bouger à une place
+        '''
         taille = 8
         for i in range(taille):
             for j in range(taille):
-                if temp[i][j]:
+                if moves[i][j]:
                     return True
         return False
 
     # voir si le roi est en échec et mat
     def mat(self, board):
+        '''
+        Voir si le roi est en mat
+        :param board: C'est une matrice 8x8 qui contient toutes les pièces de l'échiquier
+        :return: True -> le roi est matté False -> le roi n'est pas en échec et mat
+        '''
         if not self.echec(board, self.couleurBlanc):
             return False
 

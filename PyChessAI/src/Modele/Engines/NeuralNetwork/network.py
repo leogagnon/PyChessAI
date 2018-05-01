@@ -52,6 +52,11 @@ class Network:
         return allMoves
 
     def createInput(self, board, couleur):
+        '''
+        Sa va prendre le board et changer les données en données numérique que le NN peut comprendre
+        :param board: une matrice 8x8 qui va contenir toutes les pièces de l'échiquier
+        :param couleur: la couleur de la personne qui fait le mouvement
+        '''
         self.input = []
         for i in board:
             for j in i:
@@ -74,7 +79,12 @@ class Network:
         self.input.append(color_value)
 
     def calculate(self, board, couleur):
-
+        '''
+        Va faire le calcul pour voir quelle mouvement serait le meilleur (ce n'est pas pour la partie apprentissage - c'est plutot pour la partie jouer)
+        :param board: une matrice 8x8 qui va contenir toutes les pièces de l'échiquier
+        :param couleur: la couleur du NN qui est entrain de jouer
+        :return: donne le meilleur move [position_initiale, position_finale] chaque position est une coordonnée en 2d
+        '''
         self.createInput(board, couleur)
         self.remplir()
         allMoves = self.createAllMoves(board, couleur)
@@ -92,9 +102,10 @@ class Network:
 
     def learning(self, board, couleur, targetList):
         '''
-        Cela est la partie où le programme essaye d'apprendre en ajustant tout simplement ces weights selon les fonctions dans les perceptrons et les targets (ce que des pros auraient joués)
-        :param input: le input est le board dans un array et où les pièces sont remplacé par des valeurs numérique
-        :return:
+        C'est la section qui va itérer à travers les différents weights et va appeler une méthode qui va calculer de combien est ce que le weight est supposer se faire changer par
+        :param board: Une matrice 8x8 qui va contenir toutes les pièces dans l'échiquier
+        :param couleur: C'est la couleur de la personne à qui c'est le tour
+        :param targetList: C'est la liste de target (ex: le bon move était prendre la pièce de [0,0] et la déplacer à [1,1], alors le targetList va être [[0,0], [1,1]])
         '''
         self.createInput(board, couleur)
         self.remplir()

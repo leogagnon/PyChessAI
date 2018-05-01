@@ -396,9 +396,9 @@ class Chess():
                  TypePiece.CAVALIER,
                  TypePiece.TOUR]
         for i in range(8):
-            self.liste_piece[i][0] = Piece(ordre[i].name, True, [i, 0])
+            self.liste_piece[i][0] = Piece(ordre[i].value, True, [i, 0])
             self.liste_piece[i][1] = Piece("pion", True, [i, 1])
-            self.liste_piece[i][7] = Piece(ordre[i].name, False, [i, 7])
+            self.liste_piece[i][7] = Piece(ordre[i].value, False, [i, 7])
             self.liste_piece[i][6] = Piece("pion", False, [i, 6])
         for i in self.liste_piece:
             for j in i:

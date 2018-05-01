@@ -7,6 +7,12 @@ class AlphaBeta(Machine):
     """Simple implémentation de l'algorithme alpha-bêta (Pour la documentation : https://fr.wikipedia.org/wiki/%C3%89lagage_alpha-b%C3%AAta )"""
 
     def __init__(self, couleur, depth, game):
+        '''
+        C'est une sorte d'intelligence artificielle qui n'est n'évolue pas
+        :param couleur: valeur booléenne true -> le joueur jouera avec les blancs False -> le joueur jouera avec les noirs
+        :param depth: Combien de coups d'avance est ce que le AI va regarder en avance
+        :param game: va lui donner la game qui est en cours
+        '''
         self.board = None
         self.bestScore = -300
         self.depth = depth
@@ -59,7 +65,13 @@ class AlphaBeta(Machine):
         return total
 
     def __alphabeta_min(self, alpha, beta, depthleft):
-
+        '''
+        Va être la partie récursive qui va représenter le joueur adverse (qui lui aura pour but du minimiser votre score)
+        :param alpha: La plus grande valeur qu'il est possible d'obtenir
+        :param beta: La plus petite valeur qu'il est possible d'obtenir
+        :param depthleft: Combien de coups il reste à voir en avance
+        :return: le score de l'environnement qui est considéré
+        '''
         # Si c'est au bout du "decision tree" sortir l'évaluation de l'environnement
         if depthleft == 0:
             return self.__evaluate(self.board)
@@ -96,6 +108,13 @@ class AlphaBeta(Machine):
         return beta
 
     def __alphabeta_max(self, alpha, beta, depthleft):
+        '''
+        Va être la partie récursive qui va représenter le AI (qui lui aura pour but du maximer son score)
+        :param alpha: La plus grande valeur qu'il est possible d'obtenir
+        :param beta: La plus petite valeur qu'il est possible d'obtenir
+        :param depthleft: Combien de coups il reste à voir en avance
+        :return: le score de l'environnement qui est considéré
+        '''
         if depthleft == 0:
             return self.__evaluate(self.board)
         posRoi = PieceM.trouverRoi(self.board, self.COULEUR_BLANC)
