@@ -18,6 +18,6 @@ class Piece(Image):
         self.position = [coordonnees[0] * Image.DIMENSION_CASE() + Image.BOTTOM_LEFT()[0], -(self.coordonnees[1] + 1) * Image.DIMENSION_CASE() + Image.BOTTOM_LEFT()[1]]
 
     def init_image(self):
-        self.image = pygame.image.load("Vue\images\\" + self.nom + (" blanc" if self.estBlanc else " noir") + ".png")
+        self.image = pygame.image.load("Vue" + self.platform_slash + "images" + self.platform_slash + self.nom + (" blanc" if self.estBlanc else " noir") + ".png")
 
 

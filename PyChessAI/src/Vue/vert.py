@@ -1,6 +1,7 @@
 import pygame
 from Vue.image import Image
 
+
 class Vert(Image):
 
     def __init__(self, coordonnees):
@@ -9,6 +10,6 @@ class Vert(Image):
 
 
     def init_image(self):
-        self.image = pygame.image.load("Vue\images\\" + self.nom + ".png")
+        self.image = pygame.image.load("Vue" + self.platform_slash + "images" + self.platform_slash + self.nom + ".png")
 
 

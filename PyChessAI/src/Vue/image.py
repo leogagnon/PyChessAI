@@ -1,6 +1,6 @@
 import pygame
-from abc import ABC, abstractmethod
-
+from abc import ABC
+import platform
 
 class Image(ABC):
 
@@ -14,8 +14,10 @@ class Image(ABC):
         self.position = position
         self.image = None
         self.dimension = None
+        self.platform_slash = '\\' if platform.system() == "Windows" else '/'
         self.init_image()
         self.__init_dimension()
+
 
     def blit(self, screen):
         """
@@ -29,7 +31,7 @@ class Image(ABC):
         Initialise l'image
         Est overide dans toutes les classes filles
         """
-        self.image = pygame.image.load("Vue\images\\" + self.nom + ".png")
+        self.image = pygame.image.load("Vue" + self.platform_slash + "images" + self.platform_slash + self.nom + ".png")
 
     def __init_dimension(self):
         """

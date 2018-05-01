@@ -53,7 +53,6 @@ class Network:
 
     def createInput(self, board, couleur):
         self.input = []
-
         for i in board:
             for j in i:
                 multiplier = 1/6 if j is not None and j.couleurBlanc else -1/6
@@ -74,24 +73,10 @@ class Network:
         color_value = -5 if couleur else 5
         self.input.append(color_value)
 
-    def calulate(self, board, couleur):
+    def calculate(self, board, couleur):
 
         self.createInput(board, couleur)
         self.remplir()
-        print("weights")
-        for i in self.layers:
-            print("######### séparation de layer #########")
-            for j in i:
-                print(j.weights)
-        print("\n")
-
-        print("*********** Outputs **************")
-        for i in self.layers:
-            print("######### séparation de layer #########")
-            message = ""
-            for j in i:
-                message += str(j.output) + "   "
-            print(message)
         allMoves = self.createAllMoves(board, couleur)
         indexBest, score = -1, -1
 
@@ -100,7 +85,6 @@ class Network:
             for j in range(len(allMoves[i])):
                 for k in range(len(allMoves[i][j])):
                     subtotal *= self.layers[len(self.layers)-1][allMoves[i][j][k] + (k+2*j)*8].output
-            print("move = " + str(allMoves[i]) + " ; subtotal = " + str(subtotal))
             if subtotal > score:
                 indexBest, score = i, subtotal
         return allMoves[indexBest]
@@ -114,15 +98,9 @@ class Network:
         '''
         self.createInput(board, couleur)
         self.remplir()
-        '''
-        for l in range(len(self.layers)):  # le numéro du layer
-            for i in range(len(self.layers[l])):  # parcours les percetrons du layer
-                print(self.layers[l][i].weights)
-        '''
         for l in range(len(self.layers)): # le numéro du layer
             for i in range(len(self.layers[l])): #parcours les percetrons du layer
                 backpropagation = self.recursive_function(l, i, targetList)
-                #print(backpropagation)
                 for j in range(len(self.layers[l][i].weights)): #parcours les weights du perceptron
                     before = self.outputPerceptronBefore(l, j)
                     if before != 0:

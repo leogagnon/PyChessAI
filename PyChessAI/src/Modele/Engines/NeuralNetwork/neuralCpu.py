@@ -14,7 +14,7 @@ class NeuralMachine(Machine):
 
     def play(self):
 
-        move = self.nn.calulate(self.board, self.COULEUR_BLANC)
+        move = self.nn.calculate(self.board, self.COULEUR_BLANC)
 
         return move[0], move[1]
 
@@ -23,7 +23,6 @@ class NeuralMachine(Machine):
             temp = []
             with open(path + ".pkl", "rb") as f:
                 temp = pickle.load(f)
-            print(temp)
             for i in range(len(temp)):
                 for j in range(len(temp[i])):
                     self.nn.layers[i][j].weights = temp[i][j][:]

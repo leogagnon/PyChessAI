@@ -30,3 +30,5 @@ class Humain(Joueur):
             return Pion.getChoices()[2]
         elif choix == options[3]:
             return Pion.getChoices()[3]
+        return Pion.getChoices()[0]
+

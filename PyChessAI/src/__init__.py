@@ -18,8 +18,6 @@ from Modele.Game.humain import Humain
 from Modele.Game.enums import ModeDeJeu, TypePiece
 import sys
 import easygui_qt
-import easygui
-
 
 class Chess():
     def __init__(self):
@@ -30,12 +28,14 @@ class Chess():
         # Déclaration des différentes images
         self.echiquier = Image('echiquier', [0, 0])
         self.undo_button = Bouton('undo', [self.echiquier.dimension[0] + 25, 125 + 40 * 5])
-        self.list_button = Bouton('list-moves', [self.echiquier.dimension[1] + 25, 125 + 40 * 4])
+        self.list_button = Bouton('list-moves', [self.echiquier.dimension[0] + 25, 125 + 40 * 4])
+        self.recommencer = Bouton("recommencer", [self.echiquier.dimension[0] + 25, 125 + 40 * 3])
 
         # Déclaration des tableaux
         self.liste_piece = [[None for _ in range(8)] for _ in range(8)]
         self.liste_vert = []
         self.position_curseur = []
+        self.lastPosition = [0, 0]
         self.lastPosition = [0, 0]
 
         # La partie
@@ -50,8 +50,6 @@ class Chess():
         self.intro_loop()
         self.game_loop()
 
-
-
     def game_loop(self):
         """
         Fonctionnement logique de la partie
@@ -61,6 +59,7 @@ class Chess():
         if self.game.mode_de_jeu is not ModeDeJeu.MACHINE_MACHINE:
             self.undo_button.blit(self.screen)
             self.list_button.blit(self.screen)
+            self.recommencer.blit(self.screen)
 
         pygame.display.flip()
 
@@ -115,11 +114,12 @@ class Chess():
                                 liste_moves += i + '\n'
 
                             easygui_qt.show_message(liste_moves,'Liste des moves')
+                        elif self.recommencer.image.get_rect().move(self.recommencer.position[0],self.recommencer.position[1]).collidepoint(self.position_curseur):
+                            self.__restarting()
 
             else:
                 self.game.next()
                 done = self.__check_mat()
-               # pygame.time.wait(self.DELAIS_ENGINE)
                 self.__board_to_interface()
 
             pygame.display.flip()
@@ -127,9 +127,12 @@ class Chess():
         restart = self.__choix_quitter()
         
         if restart:
-            chess_init = Chess()
-            chess_init.intro_loop()
-            chess_init.game_loop()
+            self.__restarting()
+
+    def __restarting(self):
+        chess_init = Chess()
+        chess_init.intro_loop()
+        chess_init.game_loop()
 
     def __choix_quitter(self):
         options = ["Recommencer", "Quitter"]
@@ -139,8 +142,7 @@ class Chess():
 
         if choix == options[0]:
             return True
-        elif choix == options[1]:
-            return False
+        return False
 
     def __check_mat(self):
         posRoi = PieceM.trouverRoi(self.game.board, self.game.tour_blanc)
@@ -165,7 +167,6 @@ class Chess():
         """
         Fonctionnement logique de l'introduction
         """
-        choix = None
 
         HH_button = Bouton('homme-vs-homme', [(self.echiquier.dimension[0] - 50) / 2, 30 + 70 * 2])
         HM_button = Bouton('homme-vs-machine', [(self.echiquier.dimension[0] - 50) / 2, 30 + 70 * 3])
@@ -173,8 +174,6 @@ class Chess():
 
         police = pygame.font.SysFont('arial', 50)
         message = police.render('Modes de jeu', 1, (255, 255, 255))
-
-        image_gauche = Image('roi blanc', (0, 10))
 
         self.screen.blit(message, (self.echiquier.dimension[0] / 2 - 25, 50))
         HH_button.blit(self.screen)
@@ -215,10 +214,17 @@ class Chess():
 
         elif mode_de_jeu is ModeDeJeu.JOUEUR_MACHINE:
             ai = self.__choix_engine('Engine : ')
-            depth = self.__choix_depth(ai)
-            blanc = self.__choix_couleur()
 
-            self.game = Game(ModeDeJeu.JOUEUR_MACHINE, choix_couleur=blanc, AI_1=ai, depth_1=depth)
+            if ai is not None:
+                depth = self.__choix_depth(ai)
+                if depth is not None:
+                    blanc = self.__choix_couleur()
+                    self.game = Game(ModeDeJeu.JOUEUR_MACHINE, choix_couleur=blanc, AI_1=ai, depth_1=depth)
+                else:
+                    self.intro_loop()
+            else:
+                self.intro_loop()
+
         elif mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
             ai_1 = self.__choix_engine('Engine 1 (Blancs): ')
             depth_1 = self.__choix_depth(ai_1)
@@ -228,13 +234,11 @@ class Chess():
             self.game = Game(ModeDeJeu.MACHINE_MACHINE, AI_1=ai_1, depth_1=depth_1, AI_2=ai_2, depth_2=depth_2)
 
     def __choix_couleur(self):
-
         """
         Demande à l'utilisateur s'il veux commencer
         :return: True si il veux commencer, False si il ne veux pas commencer et None pour Cancel
         """
-        return easygui_qt.get_yes_or_no(message='Voulez-vous commencer? (Blancs)', title='Choix de couleur')
-
+        return easygui_qt.get_yes_or_no(message='Voulez-vous commencer (si vous fermez la fenêtre sa va choisir par défault No)?', title='Choix de couleur', )
     def __choix_engine(self, message):
         """
         Demande à l'utilisateur de choisir un engine
@@ -245,11 +249,12 @@ class Chess():
         for i in TypeEngine:
             choix.append(i.value)
 
-        reponse = easygui_qt.get_choice(message, choices=choix)
+        reponse = easygui_qt.get_choice(message, choices=choix, title = "Choix de AI", )
 
         for i in TypeEngine:
             if reponse == i.value:
                 return i
+        return None
 
     def __choix_depth(self, ai):
         """
@@ -257,7 +262,7 @@ class Chess():
         :param ai: Engine utilisée
         :return:
         """
-        depth = None
+        depth = ""
         if ai is TypeEngine.ALPHA_BETA:
             depth = easygui_qt.get_int(message='Profondeur d\'évaluation : ', title='Depth', default_value=2, min_=1,
                                        max_=5)
@@ -342,6 +347,7 @@ class Chess():
         if self.game.mode_de_jeu is not ModeDeJeu.MACHINE_MACHINE:
             self.undo_button.blit(self.screen)
             self.list_button.blit(self.screen)
+            self.recommencer.blit(self.screen)
 
         for i in self.liste_piece:
             for j in i:
