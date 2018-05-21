@@ -227,11 +227,24 @@ class Chess():
 
         elif mode_de_jeu is ModeDeJeu.MACHINE_MACHINE:
             ai_1 = self.__choix_engine('Engine 1 (Blancs): ')
-            depth_1 = self.__choix_depth(ai_1)
-            ai_2 = self.__choix_engine('Engine 2 (Noirs): ')
-            depth_2 = self.__choix_depth(ai_2)
 
-            self.game = Game(ModeDeJeu.MACHINE_MACHINE, AI_1=ai_1, depth_1=depth_1, AI_2=ai_2, depth_2=depth_2)
+            if ai_1 is not None :
+                depth_1 = self.__choix_depth(ai_1)
+                if depth_1 is not None:
+                    ai_2 = self.__choix_engine('Engine 2 (Noirs): ')
+                    if ai_2 is not None:
+                        depth_2 = self.__choix_depth(ai_2)
+                        if depth_2 is not None:
+                            self.game = Game(ModeDeJeu.MACHINE_MACHINE, AI_1=ai_1, depth_1=depth_1, AI_2=ai_2, depth_2=depth_2)
+                        else:
+                            self.intro_loop()
+                    else:
+                        self.intro_loop()
+                else :
+                    self.intro_loop()
+            else:
+                self.intro_loop()
+
 
     def __choix_couleur(self):
         """
@@ -260,7 +273,7 @@ class Chess():
         """
         Demande à l'utilisateur de choisir la profondeur d'évaluation
         :param ai: Engine utilisée
-        :return:
+        :return: le nombre de move que l'algorithme regarde d'avance
         """
         depth = ""
         if ai is TypeEngine.ALPHA_BETA:

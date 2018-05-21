@@ -18,7 +18,7 @@ class Humain(Joueur):
         :return:
         """
         options = ['Reine', 'Tour', 'Fou', 'Cavalier']
-        msg = 'Choisissez la __promotion'
+        msg = 'Choisissez la promotion'
         titre = 'Promotion'
         choix = easygui_qt.get_choice(msg, titre, options)
 

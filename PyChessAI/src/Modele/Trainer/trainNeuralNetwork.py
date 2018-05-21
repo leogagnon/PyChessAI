@@ -10,10 +10,11 @@ from Modele.Game.enums import TypePiece
 
 
 class TrainNeuralNetwork:
-    def __init__(self):
+    def __init__(self, fileData):
         '''
         Cette classe aura pour but de train le neural network (c-a-d changer la valeur de ces weights)
         '''
+        self.fileData = fileData
         self.couleur = True
         self.RELATIVE_PATH = "../Engines/NeuralNetwork/"
         self.nn = Network(65)
@@ -33,9 +34,10 @@ class TrainNeuralNetwork:
             file.write("False")
             file.close()
 
-        for num in range(depart, 1718):
+        end = 2766
+        for num in range(depart, end):
 
-            with open( self.RELATIVE_PATH + "enter/data" + str(num) + ".pkl", "rb") as f:
+            with open(self.fileData +"/data" + str(num) + ".pkl", "rb") as f:
                 targetList = pickle.load(f)
 
             couleurBlanc = True
@@ -61,7 +63,7 @@ class TrainNeuralNetwork:
             file.write(str(num + 1))
             file.close()
 
-            print("done game")
+            print("done ... " + str(num*100/end) + "%")
 
     def mouvementMemory(self, lastPosition, position, promotedPiece):
         '''
@@ -162,5 +164,5 @@ class TrainNeuralNetwork:
             for j in range(len(temp[i])):
                 self.nn.layers[i][j].weights = temp[i][j][:]
 
-lol = TrainNeuralNetwork()
+lol = TrainNeuralNetwork("enter3")
 lol.train()

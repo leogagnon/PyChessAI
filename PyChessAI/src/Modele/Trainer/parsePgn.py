@@ -11,13 +11,14 @@ import pickle
 
 
 class ParsePgn():
-    def __init__(self, file_name):
+    def __init__(self, file_game, file_data):
         '''
         L'utilité de cette classe sera de parser les files où il y a les données de milliers de games d'échecs pour que sa devienne lisible par notre programme string -> int[int[], int[]] pour lastPosition et position
         Ce programme ne sera pas exécuter en même temps que le programme d'échec (c'est runner indépendemment juste pour creer le data.txt qui sera utile au programme)
-        :param file_name: c'est tout simplement le nom du fichier à parser
+        :param file_game: c'est tout simplement le nom du fichier à parser
         '''
-        pgn_text = open(file_name + ".pgn").read()
+        pgn_text = open(file_game + ".pgn").read()
+        self.file_data = file_data
         self.games = pgn.loads(pgn_text)
         self.board = None
         self.initPiece()
@@ -71,7 +72,7 @@ class ParsePgn():
                 temp.append(infos)
                 self.mouvementMemory(infos[0], infos[1])
                 self.tourBlanc = not self.tourBlanc
-            with open("enter/data" + str(number) +".pkl", "wb") as f:
+            with open(self.file_data + "/data" + str(number) +".pkl", "wb") as f:
                 pickle.dump(temp, f)
             number += 1
             print("done ... " + str(number*100/total) + "%")
@@ -86,29 +87,59 @@ class ParsePgn():
         :return:
         '''
         if isinstance(self.board[lastPosition[0]][lastPosition[1]], Pion):
-            self.board[lastPosition[0]][lastPosition[1]].ongoingPassant(position, lastPosition, self.board)
+            if abs(position[0] - lastPosition[0]) == 1 and self.board[position[0]][position[1]] == None:
+                self.board[position[0]][lastPosition[1]] = None
 
         self.board[position[0]][position[1]] = self.board[lastPosition[0]][lastPosition[1]]
         self.board[position[0]][position[1]].position = position
         self.board[lastPosition[0]][lastPosition[1]] = None
 
-        self.board[position[0]][position[1]].prisePassant(lastPosition, self.board)
+        if isinstance(self.board[position[0]][position[1]], Pion):
+            if self.board[position[0]][position[1]].first:
+                for temp in self.board:
+                    for temp2 in temp:
+                        if isinstance(temp2, Pion) and temp2.second:
+                            temp2.second = False
+                self.board[position[0]][position[1]].first = False
+                if abs(lastPosition[1] - position[1]) == 2:
+                    self.board[position[0]][position[1]].second = True
+            elif self.board[position[0]][position[1]].second:
+                self.board[position[0]][position[1]].second = False
+        else:
+            for temp in self.board:
+                for temp2 in temp:
+                    if isinstance(temp2, Pion) and temp2.second:
+                        temp2.second = False
 
         if isinstance(self.board[position[0]][position[1]], Pion):
             if position[1] == 7 or position[1] == 0:
-                output = self.tradPiece()
+                self.__promotion(position)
                 self.promotedPiece = None
-                self.board[position[0]][position[1]].__promotion(output, self.board)
+
         elif isinstance(self.board[position[0]][position[1]], Tour):
             if not (self.board[position[0]][position[1]].moved):
                 self.board[position[0]][position[1]].moved = True
         elif isinstance(self.board[position[0]][position[1]], Roi):
             if not self.board[position[0]][position[1]].moved:
                 if lastPosition[0] - position[0] == -2:
-                    self.board[7][position[1]].mouvementMemory([position[0] - 1, position[1]], [7, position[1]], self.board)
+                    self.mouvementMemory([7, position[1]], [position[0] - 1, position[1]])
                 elif lastPosition[0] - position[0] == 2:
-                    self.board[0][position[1]].mouvementMemory([position[0] + 1, position[1]], [0, position[1]], self.board)
+                    self.mouvementMemory([0, position[1]], [position[0] + 1, position[1]])
                 self.board[position[0]][position[1]].moved = True
+
+    def __promotion(self, position):
+        '''
+        Changer le pion pour lui faire faire sa promotion à une autre pièce (qui est déterminé par self.promotedPiece)
+        :param position: la position du pion à faire une promotion
+        '''
+        if self.promotedPiece == ChessNotation.DAME.value:
+            self.board[position[0]][position[1]] = Reine(position, self.board[position[0]][position[1]].couleurBlanc)
+        elif self.promotedPiece == ChessNotation.TOUR.value:
+            self.board[position[0]][position[1]] = Tour(position, self.board[position[0]][position[1]].couleurBlanc)
+        elif self.promotedPiece == ChessNotation.FOU.value:
+            self.board[position[0]][position[1]] = Fou(position, self.board[position[0]][position[1]].couleurBlanc)
+        elif self.promotedPiece == ChessNotation.CAVALIER.value:
+            self.board[position[0]][position[1]] = Chevalier(position, self.board[position[0]][position[1]].couleurBlanc)
 
     #faire en sorte de ouput le string de __promotion
     def tradPiece(self):
@@ -249,7 +280,6 @@ class ParsePgn():
                         piece.append(j)
         return piece
 
-
-temp = ParsePgn("setGames1")
+temp = ParsePgn("setGames3", "enter3")
 temp.createFile()
 

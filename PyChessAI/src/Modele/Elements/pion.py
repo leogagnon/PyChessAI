@@ -56,9 +56,6 @@ class Pion(PieceM):
                     moves[self.position[0] - 1][self.position[1] + self.vitesse] = True
         return moves
 
-    # cette méthode fait en sorte de vérifier s'il y a vraiment une prise en passant par le pion et va faire le travail que mouvementMemory ne fait pas c'est à dire faire disparaitre le pion manger
-
-
 
     # pouvoir connaître les choix de __promotion possibles
     @staticmethod
