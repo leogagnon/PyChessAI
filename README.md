@@ -9,7 +9,7 @@ Bien que le programme fonctionne sur Linux et Mac, vous devez être sur Windows 
 ## Auteurs
 
 * **Léo Gagnon** - [LeKo0](https://github.com/LeKo0)
-* **Souleiman Ayoun** - [souleiman2](https://github.com/souleiman2)
+* **Souleiman Ayoub** - [souleiman2](https://github.com/souleiman2)
 
 ## À propos
 
